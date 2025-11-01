@@ -5,7 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'app/routes/app_pages.dart';
 
-void main() {
+void main() async {
+  await ScreenUtil.ensureScreenSize();
   runApp(
     ScreenUtilInit(
       designSize: const Size(380, 800),
