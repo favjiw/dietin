@@ -59,6 +59,7 @@ class CustomTextField extends StatelessWidget {
           width: width ?? double.infinity,
           height: height,
           child: TextFormField(
+            cursorColor: AppColors.primary,
             onChanged: onChanged,
             maxLines: maxLine,
             keyboardType: keyboardType,
@@ -66,9 +67,7 @@ class CustomTextField extends StatelessWidget {
             textInputAction: textInputAction,
             obscureText: obscureText,
             validator: validator,
-            style:
-                inputStyle ??
-                TextStyle(fontSize: fontSize ?? 14.sp, color: Colors.black),
+            style: inputStyle ?? AppTextStyles.inputText,
             decoration: InputDecoration(
               hintText: hintText,
               hintStyle:
@@ -81,7 +80,7 @@ class CustomTextField extends StatelessWidget {
               errorText: errorText,
               contentPadding:
                   contentPadding ??
-                  EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
+                  EdgeInsets.symmetric(vertical: 20.h, horizontal: 12.w),
               prefixIcon: prefixIcon,
               suffixIcon: suffixIcon,
               filled: true,

@@ -14,4 +14,19 @@ class AppTextStyles {
     fontWeight: FontWeight.bold,
     color: AppColors.mainBlack,
   );
+  static TextStyle get headingAppBar => GoogleFonts.plusJakartaSans(
+    fontSize: 24.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.mainBlack,
+  );
+  static TextStyle get bodyLight => GoogleFonts.plusJakartaSans(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.normal,
+    color: AppColors.darkGrey,
+  );
+  static TextStyle get inputText => GoogleFonts.plusJakartaSans(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.normal,
+    color: AppColors.mainBlack,
+  );
 }
