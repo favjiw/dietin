@@ -112,9 +112,7 @@ class LoginView extends GetView<LoginController> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Get.toNamed(
-                                  '/register',
-                                ); // Navigate to register page
+                                Get.toNamed('/register');
                               },
                               child: Text(
                                 ' Daftar Akun',
