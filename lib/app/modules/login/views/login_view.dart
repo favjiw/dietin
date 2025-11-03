@@ -18,7 +18,7 @@ class LoginView extends GetView<LoginController> {
       child: Scaffold(
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: SingleChildScrollView(
               child: SizedBox(
                 height:
@@ -34,58 +34,60 @@ class LoginView extends GetView<LoginController> {
                         SvgPicture.asset('assets/images/logo_img_sage.svg'),
                       ],
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        CustomTextField(
-                          labelText: 'Email',
-                          hintText: 'Masukan email',
-                          controller: controller.emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          prefixIcon: Icon(
-                            Icons.alternate_email,
-                            color: AppColors.primary,
-                          ),
-                          textInputAction: TextInputAction.next,
-                        ),
-                        SizedBox(height: 24.h),
-                        Obx(
-                          () => CustomTextField(
-                            labelText: 'Kata Sandi',
-                            hintText: 'Masukan kata sandi',
-                            keyboardType: TextInputType.visiblePassword,
-                            controller: controller.passwordController,
-                            obscureText: controller.isObscure.value,
+                    Form(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          CustomTextField(
+                            labelText: 'Email',
+                            hintText: 'Masukan email',
+                            controller: controller.emailController,
+                            keyboardType: TextInputType.emailAddress,
                             prefixIcon: Icon(
-                              Icons.lock,
+                              Icons.alternate_email,
                               color: AppColors.primary,
                             ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                controller.isObscure.value
-                                    ? Icons.visibility_off_rounded
-                                    : Icons.visibility_rounded,
+                            textInputAction: TextInputAction.next,
+                          ),
+                          SizedBox(height: 24.h),
+                          Obx(
+                            () => CustomTextField(
+                              labelText: 'Kata Sandi',
+                              hintText: 'Masukan kata sandi',
+                              keyboardType: TextInputType.visiblePassword,
+                              controller: controller.passwordController,
+                              obscureText: controller.isObscure.value,
+                              prefixIcon: Icon(
+                                Icons.lock,
                                 color: AppColors.primary,
                               ),
-                              onPressed: controller.toggle,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  controller.isObscure.value
+                                      ? Icons.visibility_off_rounded
+                                      : Icons.visibility_rounded,
+                                  color: AppColors.primary,
+                                ),
+                                onPressed: controller.toggle,
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your password';
+                                }
+                                return null;
+                              },
                             ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your password';
-                              }
-                              return null;
-                            },
                           ),
-                        ),
-                        SizedBox(height: 32.h),
-                        Text(
-                          'Lupa kata sandi?',
-                          style: AppTextStyles.label.copyWith(
-                            color: AppColors.mainBlack,
-                            fontSize: 12.sp,
+                          SizedBox(height: 32.h),
+                          Text(
+                            'Lupa kata sandi?',
+                            style: AppTextStyles.label.copyWith(
+                              color: AppColors.mainBlack,
+                              fontSize: 12.sp,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     Column(
                       children: [
