@@ -99,7 +99,7 @@ class LoginView extends GetView<LoginController> {
                             fontSize: 18.sp,
                           ),
                         ),
-                        SizedBox(height: 16.h),
+                        SizedBox(height: 24.h),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
