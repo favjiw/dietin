@@ -14,6 +14,7 @@ class RegisterView extends GetView<RegisterController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.mainWhite,
       appBar: AppBar(
         title: const Text('Daftar Akun'),
         centerTitle: true,

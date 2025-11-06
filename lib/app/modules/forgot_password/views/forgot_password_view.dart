@@ -13,6 +13,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.mainWhite,
       appBar: AppBar(
         title: const Text('Lupa Kata Sandi'),
         centerTitle: true,

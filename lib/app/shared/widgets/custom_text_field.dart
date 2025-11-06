@@ -7,6 +7,7 @@ class CustomTextField extends StatelessWidget {
   final String hintText;
   final TextEditingController controller;
   final void Function(String)? onChanged;
+  final void Function()? onTap;
   final bool obscureText;
   final double? width;
   final double? height;
@@ -31,6 +32,7 @@ class CustomTextField extends StatelessWidget {
     required this.hintText,
     required this.controller,
     this.onChanged,
+    this.onTap,
     this.labelText,
     this.obscureText = false,
     this.width,
@@ -68,6 +70,7 @@ class CustomTextField extends StatelessWidget {
             obscureText: obscureText,
             validator: validator,
             style: inputStyle ?? AppTextStyles.inputText,
+            onTap: onTap,
             decoration: InputDecoration(
               hintText: hintText,
               hintStyle:

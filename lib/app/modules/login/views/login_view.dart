@@ -16,6 +16,7 @@ class LoginView extends GetView<LoginController> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
+        backgroundColor: AppColors.mainWhite,
         body: SafeArea(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.0.w),

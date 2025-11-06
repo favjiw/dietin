@@ -47,7 +47,7 @@ class AppPages {
       page: () => const LoginView(),
       binding: LoginBinding(),
       transition: Transition.downToUp,
-      transitionDuration: Duration(milliseconds: 1400),
+      transitionDuration: Duration(milliseconds: 1200),
       curve: Curves.easeOut,
     ),
     GetPage(
@@ -60,7 +60,7 @@ class AppPages {
       page: () => const InitialhealthView(),
       binding: InitialhealthBinding(),
       transition: Transition.downToUp,
-      transitionDuration: Duration(milliseconds: 1400),
+      transitionDuration: Duration(milliseconds: 1200),
       curve: Curves.easeOut,
   ),
     GetPage(
