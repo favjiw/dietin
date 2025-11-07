@@ -5,7 +5,7 @@ class SplashController extends GetxController {
   void onReady() {
     super.onReady();
     Future.delayed(const Duration(seconds: 3), () {
-      Get.offNamed('/onboarding');
+      Get.offNamed('/botnavbar');
     });
   }
 }

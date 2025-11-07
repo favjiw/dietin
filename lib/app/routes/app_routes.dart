@@ -12,6 +12,7 @@ abstract class Routes {
   static const REGISTER = _Paths.REGISTER;
   static const INITIALHEALTH = _Paths.INITIALHEALTH;
   static const FORGOT_PASSWORD = _Paths.FORGOT_PASSWORD;
+  static const BOTNAVBAR = _Paths.BOTNAVBAR;
 }
 
 abstract class _Paths {
@@ -23,4 +24,5 @@ abstract class _Paths {
   static const REGISTER = '/register';
   static const INITIALHEALTH = '/initialhealth';
   static const FORGOT_PASSWORD = '/forgot-password';
+  static const BOTNAVBAR = '/botnavbar';
 }

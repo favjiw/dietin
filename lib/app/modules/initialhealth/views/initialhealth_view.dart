@@ -404,8 +404,9 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                               );
                                             },
                                           );
-                                      if (picked != null)
+                                      if (picked != null) {
                                         controller.setGoal(picked);
+                                      }
                                     },
                                   );
                                 }),
@@ -585,7 +586,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                                   : AppColors.lightGrey,
                                             ),
                                             color: active
-                                                ? AppColors.primary.withOpacity(
+                                                ? AppColors.primary.withValues(alpha:
                                                     0.1,
                                                   )
                                                 : Colors.transparent,
@@ -725,7 +726,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                               width: active ? 2.w : 1.w,
                                               color: active ? AppColors.primary : AppColors.lightGrey,
                                             ),
-                                            color: active ? AppColors.primary.withOpacity(0.1) : Colors.transparent,
+                                            color: active ? AppColors.primary.withValues(alpha: 0.1) : Colors.transparent,
                                           ),
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.start,

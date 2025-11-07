@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:get/get.dart';
 
+import '../modules/botnavbar/bindings/botnavbar_binding.dart';
+import '../modules/botnavbar/views/botnavbar_view.dart';
 import '../modules/forgot_password/bindings/forgot_password_binding.dart';
 import '../modules/forgot_password/views/forgot_password_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -62,11 +64,16 @@ class AppPages {
       transition: Transition.downToUp,
       transitionDuration: Duration(milliseconds: 1200),
       curve: Curves.easeOut,
-  ),
+    ),
     GetPage(
       name: _Paths.FORGOT_PASSWORD,
       page: () => const ForgotPasswordView(),
       binding: ForgotPasswordBinding(),
+    ),
+    GetPage(
+      name: _Paths.BOTNAVBAR,
+      page: () => const BotnavbarView(),
+      binding: BotnavbarBinding(),
     ),
   ];
 }

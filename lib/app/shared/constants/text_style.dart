@@ -38,4 +38,14 @@ class AppTextStyles {
     fontWeight: FontWeight.w400,
     color: AppColors.mainBlack,
   );
+  static TextStyle get botnavInactive => GoogleFonts.plusJakartaSans(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w400,
+    color: AppColors.lightGrey,
+  );
+  static TextStyle get botnavActive => GoogleFonts.plusJakartaSans(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.primary,
+  );
 }
