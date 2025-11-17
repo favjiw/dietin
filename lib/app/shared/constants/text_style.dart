@@ -83,4 +83,9 @@ class AppTextStyles {
     fontWeight: FontWeight.w400,
     color: AppColors.carbs,
   );
+  static TextStyle get recom => GoogleFonts.plusJakartaSans(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w400,
+    color: AppColors.mainWhite,
+  );
 }

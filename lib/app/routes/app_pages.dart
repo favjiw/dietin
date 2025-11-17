@@ -12,6 +12,8 @@ import '../modules/initialhealth/bindings/initialhealth_binding.dart';
 import '../modules/initialhealth/views/initialhealth_view.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
+import '../modules/meals/bindings/meals_binding.dart';
+import '../modules/meals/views/meals_view.dart';
 import '../modules/onboarding/bindings/onboarding_binding.dart';
 import '../modules/onboarding/views/onboarding_view.dart';
 import '../modules/register/bindings/register_binding.dart';
@@ -81,6 +83,11 @@ class AppPages {
       name: _Paths.SEARCH_FOOD,
       page: () => const SearchFoodView(),
       binding: SearchFoodBinding(),
+    ),
+    GetPage(
+      name: _Paths.MEALS,
+      page: () => const MealsView(),
+      binding: MealsBinding(),
     ),
   ];
 }

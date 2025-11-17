@@ -14,6 +14,7 @@ class CustomTextField extends StatelessWidget {
   final double? fontSize;
   final String? labelText;
   final EdgeInsetsGeometry? contentPadding;
+  final Color? fillColor;
 
   final Widget? prefixIcon;
   final Widget? suffixIcon;
@@ -48,6 +49,7 @@ class CustomTextField extends StatelessWidget {
     this.keyboardType,
     this.textInputAction,
     this.maxLine = 1,
+    this.fillColor,
   });
 
   @override
@@ -87,7 +89,8 @@ class CustomTextField extends StatelessWidget {
               prefixIcon: prefixIcon,
               suffixIcon: suffixIcon,
               filled: true,
-              fillColor: AppColors.light,
+              // fillcolor if null then use light
+              fillColor: fillColor ?? AppColors.light,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12.r),
                 borderSide: BorderSide.none,

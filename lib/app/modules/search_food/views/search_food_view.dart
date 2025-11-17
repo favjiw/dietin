@@ -168,7 +168,7 @@ class SearchFoodView extends GetView<SearchFoodController> {
                                     width: 1.5,
                                   ),
                                   color: controller.checkedList[index]
-                                      ? AppColors.primary.withOpacity(0.2)
+                                      ? AppColors.primary.withValues(alpha: 0.2)
                                       : Colors.transparent,
                                 ),
                                 child: controller.checkedList[index]

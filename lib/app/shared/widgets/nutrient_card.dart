@@ -2,8 +2,6 @@ import 'package:dietin/app/shared/constants/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../constants/colors.dart';
-
 class NutrientCard extends StatelessWidget {
   final String title;
   final String unit;

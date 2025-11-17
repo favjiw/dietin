@@ -24,4 +24,10 @@ class SearchFoodController extends GetxController {
         .where((i) => checkedList[i])
         .toList();
   }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
 }

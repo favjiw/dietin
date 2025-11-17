@@ -14,6 +14,7 @@ abstract class Routes {
   static const FORGOT_PASSWORD = _Paths.FORGOT_PASSWORD;
   static const BOTNAVBAR = _Paths.BOTNAVBAR;
   static const SEARCH_FOOD = _Paths.SEARCH_FOOD;
+  static const MEALS = _Paths.MEALS;
 }
 
 abstract class _Paths {
@@ -27,4 +28,5 @@ abstract class _Paths {
   static const FORGOT_PASSWORD = '/forgot-password';
   static const BOTNAVBAR = '/botnavbar';
   static const SEARCH_FOOD = '/search-food';
+  static const MEALS = '/meals';
 }
