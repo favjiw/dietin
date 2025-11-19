@@ -75,7 +75,9 @@ class HomeView extends GetView<HomeController> {
                       radius: 25.r,
                       backgroundColor: AppColors.mainWhite,
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.toNamed('/notification');
+                        },
                         icon: SvgPicture.asset(
                           'assets/images/notif_ic.svg',
                           width: 25.w,

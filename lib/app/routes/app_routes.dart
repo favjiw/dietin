@@ -18,6 +18,7 @@ abstract class Routes {
   static const DETAIL_FOOD = _Paths.DETAIL_FOOD;
   static const PROFILE = _Paths.PROFILE;
   static const PROFILE_EDIT = _Paths.PROFILE_EDIT;
+  static const NOTIFICATION = _Paths.NOTIFICATION;
 }
 
 abstract class _Paths {
@@ -35,4 +36,5 @@ abstract class _Paths {
   static const DETAIL_FOOD = '/detail-food';
   static const PROFILE = '/profile';
   static const PROFILE_EDIT = '/profile-edit';
+  static const NOTIFICATION = '/notification';
 }

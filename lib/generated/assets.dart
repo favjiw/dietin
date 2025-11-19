@@ -25,6 +25,8 @@ class Assets {
   static const String imagesMealsActIc = 'assets/images/meals_act_ic.svg';
   static const String imagesMealsInacIc = 'assets/images/meals_inac_ic.svg';
   static const String imagesNotifIc = 'assets/images/notif_ic.svg';
+  static const String imagesNotifItemIc = 'assets/images/notif_item_ic.png';
+  static const String imagesNotificationEmptyImg = 'assets/images/notification_empty_img.png';
   static const String imagesOnboardBgImg = 'assets/images/onboard_bg_img.png';
   static const String imagesPencilIc = 'assets/images/pencil_ic.svg';
   static const String imagesProfileActIc = 'assets/images/profile_act_ic.svg';
