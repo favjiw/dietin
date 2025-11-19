@@ -88,4 +88,14 @@ class AppTextStyles {
     fontWeight: FontWeight.w400,
     color: AppColors.mainWhite,
   );
+  static TextStyle get foodTitle => GoogleFonts.plusJakartaSans(
+    fontSize: 24.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.mainBlack,
+  );
+  static TextStyle get foodLabel => GoogleFonts.plusJakartaSans(
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w400,
+    color: AppColors.darkGrey,
+  );
 }

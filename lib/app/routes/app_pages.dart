@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 
 import '../modules/botnavbar/bindings/botnavbar_binding.dart';
 import '../modules/botnavbar/views/botnavbar_view.dart';
+import '../modules/detail_food/bindings/detail_food_binding.dart';
+import '../modules/detail_food/views/detail_food_view.dart';
 import '../modules/forgot_password/bindings/forgot_password_binding.dart';
 import '../modules/forgot_password/views/forgot_password_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -88,6 +90,11 @@ class AppPages {
       name: _Paths.MEALS,
       page: () => const MealsView(),
       binding: MealsBinding(),
+    ),
+    GetPage(
+      name: _Paths.DETAIL_FOOD,
+      page: () => const DetailFoodView(),
+      binding: DetailFoodBinding(),
     ),
   ];
 }

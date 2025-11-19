@@ -63,7 +63,9 @@ class MealsView extends GetView<MealsController> {
                         itemCount: 10,
                         itemBuilder: (context, index) {
                           return InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              Get.toNamed('/detail-food');
+                            },
                             child: Container(
                               width: 1.sw,
                               padding: EdgeInsets.symmetric(

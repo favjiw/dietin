@@ -15,6 +15,7 @@ abstract class Routes {
   static const BOTNAVBAR = _Paths.BOTNAVBAR;
   static const SEARCH_FOOD = _Paths.SEARCH_FOOD;
   static const MEALS = _Paths.MEALS;
+  static const DETAIL_FOOD = _Paths.DETAIL_FOOD;
 }
 
 abstract class _Paths {
@@ -29,4 +30,5 @@ abstract class _Paths {
   static const BOTNAVBAR = '/botnavbar';
   static const SEARCH_FOOD = '/search-food';
   static const MEALS = '/meals';
+  static const DETAIL_FOOD = '/detail-food';
 }
