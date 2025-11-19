@@ -98,4 +98,14 @@ class AppTextStyles {
     fontWeight: FontWeight.w400,
     color: AppColors.darkGrey,
   );
+  static TextStyle get profileLabel => GoogleFonts.plusJakartaSans(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.lightGrey,
+  );
+  static TextStyle get profileUnit => GoogleFonts.plusJakartaSans(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.mainBlack,
+  );
 }

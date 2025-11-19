@@ -18,6 +18,10 @@ import '../modules/meals/bindings/meals_binding.dart';
 import '../modules/meals/views/meals_view.dart';
 import '../modules/onboarding/bindings/onboarding_binding.dart';
 import '../modules/onboarding/views/onboarding_view.dart';
+import '../modules/profile/bindings/profile_binding.dart';
+import '../modules/profile/views/profile_view.dart';
+import '../modules/profile_edit/bindings/profile_edit_binding.dart';
+import '../modules/profile_edit/views/profile_edit_view.dart';
 import '../modules/register/bindings/register_binding.dart';
 import '../modules/register/views/register_view.dart';
 import '../modules/search_food/bindings/search_food_binding.dart';
@@ -95,6 +99,16 @@ class AppPages {
       name: _Paths.DETAIL_FOOD,
       page: () => const DetailFoodView(),
       binding: DetailFoodBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROFILE,
+      page: () => const ProfileView(),
+      binding: ProfileBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROFILE_EDIT,
+      page: () => const ProfileEditView(),
+      binding: ProfileEditBinding(),
     ),
   ];
 }
