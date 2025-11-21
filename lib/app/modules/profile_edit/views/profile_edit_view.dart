@@ -19,7 +19,7 @@ class ProfileEditView extends GetView<ProfileEditController> {
         context: context,
         isScrollControlled: true,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         ),
         builder: (_) => Padding(
           padding: EdgeInsets.only(
@@ -187,7 +187,8 @@ class ProfileEditView extends GetView<ProfileEditController> {
                 const SizedBox(height: 8),
                 Obx(
                   () => Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 13.h),
+                    width: 380,
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
                     decoration: BoxDecoration(
                       color: AppColors.mainWhite,
                       borderRadius: BorderRadius.circular(12.r),
@@ -203,14 +204,11 @@ class ProfileEditView extends GetView<ProfileEditController> {
                         GestureDetector(
                           onTap: () => showAllergyModal(context),
                           child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 4.w,
-                              vertical: 5.h,
-                            ),
-                            margin: EdgeInsets.only(right: 9.w, bottom: 9.h),
+                            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h,),
+                            margin: EdgeInsets.only(right: 8.w, bottom: 8.h),
                             decoration: BoxDecoration(
                               color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(7.r),
+                              borderRadius: BorderRadius.circular(8.r),
                             ),
                             child: Icon(
                               Icons.add_rounded,

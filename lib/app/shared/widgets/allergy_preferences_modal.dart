@@ -1,101 +1,123 @@
-import 'package:dietin/app/modules/profile_edit/controllers/profile_edit_controller.dart';
-import 'package:dietin/app/shared/constants/constant.dart';
+import 'package:dietin/app/shared/constants/colors.dart';
+import 'package:dietin/app/shared/constants/text_style.dart';
 import 'package:dietin/app/shared/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:dietin/app/modules/profile_edit/controllers/profile_edit_controller.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+
 
 class AllergyPreferenceModal extends StatelessWidget {
   final ProfileEditController controller = Get.find();
 
   AllergyPreferenceModal({super.key});
 
-  Widget _buildAllergyButton(String allergy) {
-    final bool selected = controller.allergies.contains(allergy);
-
-    return OutlinedButton.icon(
-      onPressed: () {
-        if (selected) {
-          controller.removeAllergy(allergy);
-        } else {
-          controller.addAllergy(allergy);
-        }
-      },
-      icon: _allergyIcon(allergy),
-      label: Text(allergy, style: TextStyle(fontSize: 12)),
-      style: OutlinedButton.styleFrom(
-        side: BorderSide(color: selected ? Colors.teal : Colors.grey),
-        backgroundColor: selected ? Colors.teal[100] : Colors.transparent,
-        foregroundColor: Colors.black87,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-
-  Widget _allergyIcon(String allergy) {
-    // Use emojis as fallback icons
-    switch (allergy) {
-      case 'Susu, Telur, dan Produk Susu Lainnya':
-        return const Icon(Icons.local_drink, size: 18, color: Colors.teal);
-      case 'Roti / Olahan Roti':
-        return const Icon(Icons.bakery_dining, size: 18, color: Colors.teal);
-      case 'Daging':
-        return const Icon(Icons.set_meal, size: 18, color: Colors.teal);
-      case 'Udang':
-        return const Icon(Icons.set_meal, size: 18, color: Colors.teal);
-      case 'Kacang':
-        return const Icon(Icons.spa, size: 18, color: Colors.teal);
-      case 'Teh dan Kopi':
-        return const Icon(Icons.local_cafe, size: 18, color: Colors.teal);
-      case 'Kedelai':
-        return const Icon(Icons.grain, size: 18, color: Colors.teal);
-      case 'Wijen':
-        return const Icon(Icons.grain, size: 18, color: Colors.teal);
-      case 'Ikan':
-        return const Icon(Icons.set_meal, size: 18, color: Colors.teal);
-      default:
-        return const Icon(Icons.help_outline, size: 18, color: Colors.teal);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final allergies = controller.allAllergyOptions;
-
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.darkGrey,
-              borderRadius: BorderRadius.circular(12.r),
+          // Drag Indicator
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
-          SizedBox(height: 34.h),
-          Text('Preferensi Alergi', style: AppTextStyles.headingAppBar),
-          SizedBox(height: 34.h),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: allergies.map(_buildAllergyButton).toList(),
-          ),
-          SizedBox(height: 34.h),
+
+          SizedBox(height: 24.h),
+          Center(child: Text('Preferensi Alergi', style: AppTextStyles.headingAppBar)),
+          SizedBox(height: 20.h),
+
+          /// Dua kolom responif
+          Obx(() {
+            final sel = controller.allergies;
+
+            Widget tile(String label, String asset) {
+              final active = sel.contains(label);
+              return GestureDetector(
+                onTap: () => controller.toggleAllergy(label),
+                child: Container(
+                  height: 80.h,
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      width: 1.w,
+                      color: active ? AppColors.primary : AppColors.lightGrey,
+                    ),
+                    color: active
+                        ? AppColors.primary.withOpacity(0.1)
+                        : Colors.transparent,
+                  ),
+                  child: Row(
+                    children: [
+                      Center(
+                        child: Image.asset(
+                          asset,
+                          width: 36.r,
+                          height: 36.r,
+                          fit: BoxFit.fill,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.error_outline,
+                              color: Colors.red,
+                              size: 16.r,
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Text(
+                          label,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.label.copyWith(
+                            color: active ? AppColors.primary : Colors.black87,
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            final itemWidth = (1.sw - 16.w * 2 - 9.w) / 2;
+
+            return Wrap(
+              spacing: 9.w,
+              runSpacing: 9.h,
+              children: controller.allAllergyOptionsWithAssets.entries
+                  .map((e) => SizedBox(
+                width: itemWidth,
+                child: tile(e.key, e.value),
+              ))
+                  .toList(),
+            );
+          }),
+
+          SizedBox(height: 28.h),
+
           SizedBox(
             width: double.infinity,
             child: CustomButton(
               text: 'Selesai',
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               backgroundColor: AppColors.mainBlack,
               borderRadius: 64,
               textStyle: AppTextStyles.label.copyWith(
@@ -103,18 +125,9 @@ class AllergyPreferenceModal extends StatelessWidget {
                 fontSize: 18.sp,
               ),
             ),
-            // child: ElevatedButton(
-            //   onPressed: () {
-            //     Navigator.of(context).pop();
-            //   },
-            //   style: ElevatedButton.styleFrom(
-            //     backgroundColor: Colors.black,
-            //     padding: const EdgeInsets.symmetric(vertical: 14),
-            //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            //   ),
-            //   child: const Text('Selesai', style: TextStyle(fontSize: 16)),
-            // ),
           ),
+
+          SizedBox(height: 12.h),
         ],
       ),
     );

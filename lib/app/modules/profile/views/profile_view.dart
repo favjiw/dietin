@@ -139,8 +139,8 @@ class ProfileView extends GetView<ProfileController> {
                   ProfileMenuItem(
                     icon: Icons.logout_outlined,
                     label: 'Keluar',
-                    labelColor: AppColors.primary,
-                    iconColor: AppColors.primary,
+                    labelColor: Colors.red,
+                    iconColor: Colors.red,
                     onTap: () {
                       // Logout action
                     },
