@@ -30,6 +30,8 @@ import '../modules/search_food/bindings/search_food_binding.dart';
 import '../modules/search_food/views/search_food_view.dart';
 import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
+import '../modules/statistics/bindings/statistics_binding.dart';
+import '../modules/statistics/views/statistics_view.dart';
 
 // ignore_for_file: constant_identifier_names
 
@@ -116,6 +118,11 @@ class AppPages {
       name: _Paths.NOTIFICATION,
       page: () => const NotificationView(),
       binding: NotificationBinding(),
+    ),
+    GetPage(
+      name: _Paths.STATISTICS,
+      page: () => const StatisticsView(),
+      binding: StatisticsBinding(),
     ),
   ];
 }

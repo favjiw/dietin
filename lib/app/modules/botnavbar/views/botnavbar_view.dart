@@ -1,11 +1,11 @@
 import 'package:dietin/app/modules/home/controllers/home_controller.dart';
 import 'package:dietin/app/modules/home/views/home_view.dart';
-import 'package:dietin/app/modules/initialhealth/controllers/initialhealth_controller.dart';
-import 'package:dietin/app/modules/initialhealth/views/initialhealth_view.dart';
 import 'package:dietin/app/modules/meals/controllers/meals_controller.dart';
 import 'package:dietin/app/modules/meals/views/meals_view.dart';
 import 'package:dietin/app/modules/profile/controllers/profile_controller.dart';
 import 'package:dietin/app/modules/profile/views/profile_view.dart';
+import 'package:dietin/app/modules/statistics/controllers/statistics_controller.dart';
+import 'package:dietin/app/modules/statistics/views/statistics_view.dart';
 import 'package:dietin/app/shared/constants/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,13 +21,14 @@ class BotnavbarView extends GetView<BotnavbarController> {
   Widget build(BuildContext context) {
     Get.lazyPut(() => HomeController(), fenix: true);
     Get.lazyPut(() => MealsController(), fenix: true);
+    Get.lazyPut(() => StatisticsController(), fenix: true);
     Get.lazyPut(() => ProfileController(), fenix: true);
 
     final List<Widget> pages = [
       HomeView(),
       MealsView(),
       Container(color: Colors.green),
-      Container(color: Colors.blue),
+      StatisticsView(),
       ProfileView(),
     ];
     return Obx(
