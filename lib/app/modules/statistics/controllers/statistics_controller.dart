@@ -8,8 +8,26 @@ class StatisticsController extends GetxController {
   final selectedNutrient = 'Kalori'.obs;
   final touchedIndex = (-1).obs;
   final selectedDayIndex = (-1).obs; // -1 berarti tidak ada yang dipilih
+  final selectedMonth = 'November'.obs;
+  final selectedYear = '2025'.obs;
+  final currentDateRangeIndex = 0.obs; // Index untuk rentang tanggal (0-based)
 
   final List<String> nutrients = ['Kalori', 'Protein', 'Karbohidrat', 'Lemak'];
+  final List<String> months = [
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
+  ];
+  final List<String> years = ['2023', '2024', '2025'];
   final List<String> weekDays = [
     'Min',
     'Sen',
@@ -364,6 +382,99 @@ class StatisticsController extends GetxController {
     },
   };
 
+  // Data untuk line chart bulanan (30 hari dalam sebulan)
+  Map<String, Map<String, dynamic>> get monthlyNutritionData {
+    // Generate data untuk bulan yang dipilih
+    int daysInMonth = _getDaysInMonth(
+      selectedMonth.value,
+      int.parse(selectedYear.value),
+    );
+
+    return {
+      'Kalori': {
+        'total': 2000,
+        'days': List.generate(daysInMonth, (index) {
+          int day = index + 1;
+          // Generate nilai random untuk demo
+          double percentage = 0.5 + (day % 7) * 0.1 + ((day % 3) * 0.05);
+          int value = (2000 * percentage).round();
+          return {'day': day, 'value': value, 'percentage': percentage};
+        }),
+      },
+      'Protein': {
+        'total': 150,
+        'days': List.generate(daysInMonth, (index) {
+          int day = index + 1;
+          double percentage = 0.5 + (day % 7) * 0.08 + ((day % 4) * 0.06);
+          int value = (150 * percentage).round();
+          return {'day': day, 'value': value, 'percentage': percentage};
+        }),
+      },
+      'Karbohidrat': {
+        'total': 300,
+        'days': List.generate(daysInMonth, (index) {
+          int day = index + 1;
+          double percentage = 0.55 + (day % 6) * 0.09 + ((day % 5) * 0.04);
+          int value = (300 * percentage).round();
+          return {'day': day, 'value': value, 'percentage': percentage};
+        }),
+      },
+      'Lemak': {
+        'total': 70,
+        'days': List.generate(daysInMonth, (index) {
+          int day = index + 1;
+          double percentage = 0.6 + (day % 5) * 0.07 + ((day % 4) * 0.05);
+          int value = (70 * percentage).round();
+          return {'day': day, 'value': value, 'percentage': percentage};
+        }),
+      },
+    };
+  }
+
+  // Get filtered data untuk line chart (5 hari per rentang)
+  Map<String, dynamic> get filteredMonthlyData {
+    final fullData = monthlyNutritionData[selectedNutrient.value]!;
+    final allDays = fullData['days'] as List;
+
+    final startIndex = currentDateRangeIndex.value * 5;
+    final endIndex = (startIndex + 5).clamp(0, allDays.length);
+
+    final filteredDays = allDays.sublist(startIndex, endIndex);
+
+    return {
+      'total': fullData['total'],
+      'days': filteredDays,
+      'startDay': filteredDays.isNotEmpty ? filteredDays.first['day'] : 1,
+      'endDay': filteredDays.isNotEmpty ? filteredDays.last['day'] : 1,
+    };
+  }
+
+  // Get total jumlah rentang tanggal
+  int get totalDateRanges {
+    final fullData = monthlyNutritionData[selectedNutrient.value]!;
+    final allDays = fullData['days'] as List;
+    return (allDays.length / 5).ceil();
+  }
+
+  // Navigasi ke rentang berikutnya
+  void nextDateRange() {
+    if (currentDateRangeIndex.value < totalDateRanges - 1) {
+      currentDateRangeIndex.value++;
+    }
+  }
+
+  // Navigasi ke rentang sebelumnya
+  void previousDateRange() {
+    if (currentDateRangeIndex.value > 0) {
+      currentDateRangeIndex.value--;
+    }
+  }
+
+  int _getDaysInMonth(String month, int year) {
+    int monthIndex = months.indexOf(month) + 1;
+    return DateTime(year, monthIndex + 1, 0).day;
+  }
+
   void changeTab(int index) {
     selectedTab.value = index;
     selectedDayIndex.value = -1; // Reset selected day when changing tab
@@ -385,6 +496,20 @@ class StatisticsController extends GetxController {
       selectedDayIndex.value = -1; // Unselect if already selected
     } else {
       selectedDayIndex.value = index; // Select the day
+    }
+  }
+
+  void changeMonth(String? month) {
+    if (month != null) {
+      selectedMonth.value = month;
+      currentDateRangeIndex.value = 0; // Reset ke rentang pertama
+    }
+  }
+
+  void changeYear(String? year) {
+    if (year != null) {
+      selectedYear.value = year;
+      currentDateRangeIndex.value = 0; // Reset ke rentang pertama
     }
   }
 
