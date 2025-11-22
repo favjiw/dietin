@@ -1,5 +1,7 @@
 import 'package:dietin/app/modules/home/controllers/home_controller.dart';
 import 'package:dietin/app/modules/home/views/home_view.dart';
+import 'package:dietin/app/modules/initialhealth/controllers/initialhealth_controller.dart';
+import 'package:dietin/app/modules/initialhealth/views/initialhealth_view.dart';
 import 'package:dietin/app/modules/meals/controllers/meals_controller.dart';
 import 'package:dietin/app/modules/meals/views/meals_view.dart';
 import 'package:dietin/app/modules/profile/controllers/profile_controller.dart';

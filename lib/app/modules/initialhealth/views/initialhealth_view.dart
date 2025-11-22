@@ -327,9 +327,8 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                     keyboardType: TextInputType.number,
                                     controller: controller.weightController,
                                     suffixIcon: Image.asset(
-                                      'assets/images/cm_ic.png',
-                                      width: 24.w,
-                                      height: 24.h,
+                                      'assets/images/kg_ic.png',
+                                      width: 14,
                                     ),
                                     errorText: showErr
                                         ? 'Berat badan harus antara 2–300 kg'
@@ -427,9 +426,8 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                     controller:
                                         controller.targetWeightController,
                                     suffixIcon: Image.asset(
-                                      'assets/images/cm_ic.png',
-                                      width: 24.w,
-                                      height: 24.h,
+                                      'assets/images/kg_ic.png',
+                                      width: 14,
                                     ),
                                     errorText: showErr
                                         ? 'Berat badan harus antara 2–300 kg'
@@ -679,7 +677,8 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                   Text('Alergi', style: AppTextStyles.labelBold),
                                   SizedBox(height: 12.h),
                                   Obx(() {
-                                    final sel = controller.selectedAllergies;
+                                    final sel = controller.allergies;
+
                                     return Container(
                                       width: 1.sw,
                                       padding: EdgeInsets.symmetric(vertical: 13.h, horizontal: 16.w),
@@ -692,18 +691,22 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                           : Wrap(
                                         spacing: 8.w,
                                         runSpacing: 8.h,
-                                        children: controller.allergyCategories
-                                            .where((c) => sel.contains(c.id))
-                                            .map((c) => Container(
+                                        children: sel
+                                          .map((text) => Container(
                                           padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5.h),
                                           decoration: BoxDecoration(
                                             color: AppColors.primary,
-                                            borderRadius: BorderRadius.circular(6.54.r),
+                                            borderRadius: BorderRadius.circular(6.r),
                                           ),
-                                          child: Text(c.label,
-                                              style: AppTextStyles.bodyLight.copyWith(color: AppColors.mainWhite)),
+                                          child: Text(
+                                            text,
+                                            style: AppTextStyles.bodyLight.copyWith(
+                                              color: AppColors.mainWhite,
+                                              fontSize: 14.sp,
+                                            ),
+                                          ),
                                         ))
-                                            .toList(),
+                                          .toList(),
                                       ),
                                     );
                                   }),
@@ -711,39 +714,49 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                   SizedBox(height: 25.h),
                                   
                                   Obx(() {
-                                    final sel = controller.selectedAllergies;
+                                    final sel = controller.allergies;
                             
-                                    Widget tile(AllergyCategory c) {
-                                      final active = sel.contains(c.id);
+                                    Widget tile(String label, String asset) {
+                                      final active = sel.contains(label);
                                       return GestureDetector(
-                                        onTap: () => controller.toggleAllergy(c.id),
+                                        onTap: () => controller.toggleAllergy(label),
                                         child: Container(
-                                          height: 65.h,
+                                          height: 80.h,
                                           padding: EdgeInsets.symmetric(horizontal: 12.w),
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(12.r),
                                             border: Border.all(
-                                              width: active ? 2.w : 1.w,
+                                              width: 1.w,
                                               color: active ? AppColors.primary : AppColors.lightGrey,
                                             ),
                                             color: active ? AppColors.primary.withValues(alpha: 0.1) : Colors.transparent,
                                           ),
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.start,
                                             children: [
-                                              CircleAvatar(
-                                                radius: 15.r,
-                                                backgroundColor: active ? AppColors.primary : AppColors.mainWhite,
-                                                child: Image.asset(c.asset),
+                                              Center(
+                                                child: Image.asset(
+                                                  asset,
+                                                  width: 36.w,
+                                                  height: 36.h,
+                                                  fit: BoxFit.contain,
+                                                  errorBuilder: (context, error, stackTrace) {
+                                                    return Icon(
+                                                      Icons.error_outline,
+                                                      color: Colors.red,
+                                                      size: 16.r,
+                                                    );
+                                                  },
+                                                ),
                                               ),
                                               SizedBox(width: 8.w),
                                               Expanded(
                                                 child: Text(
-                                                  c.label,
+                                                  label,
                                                   maxLines: 2,
                                                   overflow: TextOverflow.ellipsis,
                                                   style: AppTextStyles.labelBold.copyWith(
                                                     color: active ? AppColors.primary : Colors.black87,
+                                                    fontSize: 14,
                                                   ),
                                                 ),
                                               ),
@@ -752,17 +765,18 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                         ),
                                       );
                                     }
-                            
-                                    // dua kolom responsif
+
                                     final itemWidth = (1.sw - 16.w * 2 - 9.w) / 2;
+
                                     return Wrap(
                                       spacing: 9.w,
                                       runSpacing: 9.h,
-                                      children: controller.allergyCategories
-                                          .map((c) => SizedBox(width: itemWidth, child: tile(c)))
+                                      children: controller.allAllergyOptionsWithAssets.entries
+                                          .map((e) => SizedBox(width: itemWidth, child: tile(e.key, e.value)))
                                           .toList(),
                                     );
                                   }),
+
                                 ],
                               ),
                             ),

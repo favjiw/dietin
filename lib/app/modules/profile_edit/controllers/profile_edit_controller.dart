@@ -7,11 +7,16 @@ class ProfileEditController extends GetxController {
   TextEditingController birthDateController = TextEditingController();
   TextEditingController heightController = TextEditingController();
   TextEditingController weightController = TextEditingController();
+
   var fullName = 'Gilang Nanda Saputra'.obs;
   var email = 'gilangrajagula@gmail.com'.obs;
   var birthDate = '69 Februari 1907'.obs;
   var height = '160'.obs;
   var weight = '61'.obs;
+
+  RxList<String> allergies = <String>[].obs;
+  List<String> get selectedAllergies => allergies;
+
 
   // init textfield with current values
   @override
@@ -23,8 +28,6 @@ class ProfileEditController extends GetxController {
     heightController.text = height.value;
     weightController.text = weight.value;
   }
-
-  var allergies = <String>["Teh dan Kopi", "Kacang", "Susu, Telur, dan Produk Susu Lainnya"].obs;
 
   final List<String> allAllergyOptions = [
     'Susu, Telur, dan Produk Susu Lainnya',
@@ -38,6 +41,18 @@ class ProfileEditController extends GetxController {
     'Ikan',
   ];
 
+  final Map<String, String> allAllergyOptionsWithAssets = {
+    'Susu, Telur, dan Produk Susu Lainnya': 'assets/images/susu.png',
+    'Roti / Olahan Roti': 'assets/images/roti.png',
+    'Daging': 'assets/images/daging.png',
+    'Udang': 'assets/images/udang.png',
+    'Kacang': 'assets/images/kacang.png',
+    'Teh dan Kopi': 'assets/images/tehdankopi.png',
+    'Kedelai': 'assets/images/kedelai.png',
+    'Wijen': 'assets/images/wijen.png',
+    'Ikan': 'assets/images/ikan.png',
+  };
+
   void addAllergy(String allergy) {
     if (!allergies.contains(allergy)) {
       allergies.add(allergy);
@@ -46,6 +61,14 @@ class ProfileEditController extends GetxController {
 
   void removeAllergy(String allergy) {
     allergies.remove(allergy);
+  }
+
+  void toggleAllergy(String allergy) {
+    if (allergies.contains(allergy)) {
+      allergies.remove(allergy);
+    } else {
+      allergies.add(allergy);
+    }
   }
 
   void updateFullName(String value) => fullName.value = value;

@@ -50,7 +50,21 @@ class InitialhealthController extends GetxController {
     AllergyCategory('wijen', 'Wijen', 'assets/images/ic_sesame.png'),
   ];
 
-  final selectedAllergies = <String>{}.obs;
+  // final selectedAllergies = <String>{}.obs;
+  RxList<String> allergies = <String>[].obs;
+  List<String> get selectedAllergies => allergies;
+
+  final Map<String, String> allAllergyOptionsWithAssets = {
+    'Susu, Telur, dan Produk Susu Lainnya': 'assets/images/susu.png',
+    'Roti / Olahan Roti': 'assets/images/roti.png',
+    'Daging': 'assets/images/daging.png',
+    'Udang': 'assets/images/udang.png',
+    'Kacang': 'assets/images/kacang.png',
+    'Teh dan Kopi': 'assets/images/tehdankopi.png',
+    'Kedelai': 'assets/images/kedelai.png',
+    'Wijen': 'assets/images/wijen.png',
+    'Ikan': 'assets/images/ikan.png',
+  };
 
   bool get _isBirthDateEmpty => birthDateController.text.trim().isEmpty;
   bool get _isHeightEmpty => heightController.text.trim().isEmpty;
