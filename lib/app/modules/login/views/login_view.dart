@@ -95,10 +95,13 @@ class LoginView extends GetView<LoginController> {
                     ),
                     Column(
                       children: [
+                        Obx(()=> controller.isLoading.value
+                            ? Center(child: CircularProgressIndicator())
+                            :
                         CustomButton(
                           text: 'Masuk',
                           onPressed: () {
-                            Get.offNamed('/initialhealth');
+                            controller.login();
                           },
                           backgroundColor: AppColors.mainBlack,
                           borderRadius: 64,
@@ -106,7 +109,7 @@ class LoginView extends GetView<LoginController> {
                             color: AppColors.light,
                             fontSize: 18.sp,
                           ),
-                        ),
+                        )),
                         SizedBox(height: 24.h),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,

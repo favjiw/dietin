@@ -1,6 +1,8 @@
+import 'package:dietin/app/services/UserService.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:get_storage/get_storage.dart';
 
 class AllergyCategory {
   final String id;
@@ -50,7 +52,6 @@ class InitialhealthController extends GetxController {
     AllergyCategory('wijen', 'Wijen', 'assets/images/ic_sesame.png'),
   ];
 
-  // final selectedAllergies = <String>{}.obs;
   RxList<String> allergies = <String>[].obs;
   List<String> get selectedAllergies => allergies;
 
@@ -65,6 +66,11 @@ class InitialhealthController extends GetxController {
     'Wijen': 'assets/images/wijen.png',
     'Ikan': 'assets/images/ikan.png',
   };
+
+  var isLoading = false.obs;
+
+  final GetStorage _storage = GetStorage();
+  static const String _initialCompletedKey = 'initial_health_completed';
 
   bool get _isBirthDateEmpty => birthDateController.text.trim().isEmpty;
   bool get _isHeightEmpty => heightController.text.trim().isEmpty;
@@ -85,11 +91,11 @@ class InitialhealthController extends GetxController {
         'isTargetWeightValid=${isTargetWeightValid.value} isEmpty=$_isTargetWeightEmpty');
   }
 
-  void toggleAllergy(String id) {
-    if (selectedAllergies.contains(id)) {
-      selectedAllergies.remove(id);
+  void toggleAllergy(String label) {
+    if (selectedAllergies.contains(label)) {
+      selectedAllergies.remove(label);
     } else {
-      selectedAllergies.add(id);
+      selectedAllergies.add(label);
     }
   }
 
@@ -98,14 +104,82 @@ class InitialhealthController extends GetxController {
     goalController.text = v;
   }
 
+  String _mapGoalToApi(String goal) {
+    switch (goal) {
+      case 'Turun berat':
+        return 'Weight Loss';
+      case 'Naik berat':
+        return 'Weight Gain';
+      case 'Pertahankan berat':
+        return 'Maintain Weight';
+      case 'Bangun otot':
+        return 'Build Muscle';
+      default:
+        return goal;
+    }
+  }
+
+  List<String> _mapSelectedAllergiesToLabels() {
+    return List<String>.from(selectedAllergies);
+  }
+
   Future<void> completeOnboarding() async {
-    if (validateAllFields()) {
-      Get.log('Gender selected: ${selectedGender.value}');
-      Get.log('Birth date: ${birthDateController.text}');
-      Get.log('Height: ${heightController.text}');
-      Get.log('Weight: ${weightController.text}');
-      Get.log('Target Weight: ${targetWeightController.text}');
-      Get.offAllNamed('/home');
+    if (!validateAllFields()) return;
+
+    try {
+      isLoading.value = true;
+
+      final birthText = birthDateController.text.trim();
+      final parts = birthText.split('/');
+      final parsedBirth = DateTime(
+        int.parse(parts[2]),
+        int.parse(parts[1]),
+        int.parse(parts[0]),
+      );
+      final birthForApi = DateFormat('yyyy-MM-dd').format(parsedBirth);
+
+      final height = double.parse(heightController.text.trim());
+      final weight = double.parse(weightController.text.trim());
+      final targetWeight = double.parse(targetWeightController.text.trim());
+
+      final goalApi = _mapGoalToApi(selectedGoal.value);
+      final activityApi = selectedActivityLevel.value ?? '';
+      final genderApi = selectedGender.value ?? '';
+      final allergyLabels = _mapSelectedAllergiesToLabels();
+
+      await UserServices.to.onboard(
+        birthDate: birthForApi,
+        height: height,
+        weight: weight,
+        gender: genderApi,
+        mainGoal: goalApi,
+        weightGoal: targetWeight,
+        activityLevel: activityApi,
+        allergies: allergyLabels,
+      );
+
+      await _storage.write(_initialCompletedKey, true);
+
+      Get.snackbar(
+        'Berhasil',
+        'Data kesehatan awal tersimpan',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+
+      Get.offAllNamed('/botnavbar');
+    } catch (e) {
+      Get.snackbar(
+        'Gagal',
+        'Gagal menyimpan data: $e',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      Get.log('Onboarding error: $e');
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -208,65 +282,105 @@ class InitialhealthController extends GetxController {
     switch (_currentPage) {
       case 0:
         if (selectedGender.value == null) {
-          Get.snackbar('Peringatan','Harap pilih jenis kelamin',
-              backgroundColor: Colors.orange, colorText: Colors.white);
+          Get.snackbar(
+            'Peringatan',
+            'Harap pilih jenis kelamin',
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
           return false;
         }
         if (_isBirthDateEmpty) {
-          Get.snackbar('Peringatan','Tanggal lahir wajib diisi',
-              backgroundColor: Colors.orange, colorText: Colors.white);
+          Get.snackbar(
+            'Peringatan',
+            'Tanggal lahir wajib diisi',
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
           return false;
         }
         if (!validateBirthDate()) {
-          Get.snackbar('Peringatan','Harap pilih tanggal lahir yang valid',
-              backgroundColor: Colors.orange, colorText: Colors.white);
+          Get.snackbar(
+            'Peringatan',
+            'Harap pilih tanggal lahir yang valid',
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
           return false;
         }
         if (_isHeightEmpty) {
-          Get.snackbar('Peringatan','Tinggi badan wajib diisi',
-              backgroundColor: Colors.orange, colorText: Colors.white);
+          Get.snackbar(
+            'Peringatan',
+            'Tinggi badan wajib diisi',
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
           return false;
         }
         if (!validateHeight()) {
-          Get.snackbar('Peringatan','Harap masukkan tinggi badan yang valid (50–250 cm)',
-              backgroundColor: Colors.orange, colorText: Colors.white);
+          Get.snackbar(
+            'Peringatan',
+            'Harap masukkan tinggi badan yang valid (50–250 cm)',
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
           return false;
         }
         if (_isWeightEmpty) {
-          Get.snackbar('Peringatan','Berat badan wajib diisi',
-              backgroundColor: Colors.orange, colorText: Colors.white);
+          Get.snackbar(
+            'Peringatan',
+            'Berat badan wajib diisi',
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
           return false;
         }
         if (!validateWeight()) {
-          Get.snackbar('Peringatan','Harap masukkan berat badan yang valid (2–300 kg)',
-              backgroundColor: Colors.orange, colorText: Colors.white);
+          Get.snackbar(
+            'Peringatan',
+            'Harap masukkan berat badan yang valid (2–300 kg)',
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
           return false;
         }
         return true;
 
       case 1:
-      // activity level
-
-        // goal
         if (isGoalEmpty) {
-          Get.snackbar('Peringatan','Harap pilih tujuan utama',
-              backgroundColor: Colors.orange, colorText: Colors.white);
+          Get.snackbar(
+            'Peringatan',
+            'Harap pilih tujuan utama',
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
           return false;
         }
-        // target weight
         if (_isTargetWeightEmpty) {
-          Get.snackbar('Peringatan','Berat target wajib diisi',
-              backgroundColor: Colors.orange, colorText: Colors.white);
+          Get.snackbar(
+            'Peringatan',
+            'Berat target wajib diisi',
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
           return false;
         }
         if (!validateTargetWeight()) {
-          Get.snackbar('Peringatan','Harap masukkan berat target yang valid (2–300 kg)',
-              backgroundColor: Colors.orange, colorText: Colors.white);
+          Get.snackbar(
+            'Peringatan',
+            'Harap masukkan berat target yang valid (2–300 kg)',
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
           return false;
         }
         if (selectedActivityLevel.value == null) {
-          Get.snackbar('Peringatan','Harap pilih tingkat aktivitas',
-              backgroundColor: Colors.orange, colorText: Colors.white);
+          Get.snackbar(
+            'Peringatan',
+            'Harap pilih tingkat aktivitas',
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
           return false;
         }
         return true;
@@ -275,7 +389,6 @@ class InitialhealthController extends GetxController {
         return false;
     }
   }
-
 
   bool validateAllFields() {
     if (selectedGender.value == null) return false;
@@ -288,28 +401,26 @@ class InitialhealthController extends GetxController {
     return true;
   }
 
-
   int get _currentPage {
     if (!pageController.hasClients) return pageIndex.value;
     final p = pageController.page;
     return p == null ? pageIndex.value : p.round();
   }
 
-
   void nextPage() {
-    _logState('nextPage:before');                                               // <— LOG
+    _logState('nextPage:before');
     final ok = validateCurrentPage();
     Get.log('[nextPage] validate=$ok currentPage=$_currentPage pageIndex=${pageIndex.value}');
     if (!ok) return;
 
     if (pageIndex.value < 2) {
-      Get.log('[nextPage] moving to next page');                                // <— LOG
+      Get.log('[nextPage] moving to next page');
       pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.ease,
       );
     } else {
-      Get.log('[nextPage] completing onboarding');                               // <— LOG
+      Get.log('[nextPage] completing onboarding');
       completeOnboarding();
     }
   }
@@ -375,11 +486,10 @@ class InitialhealthController extends GetxController {
       }
     });
 
-    birthDateController.addListener(validateBirthDate); // optional tapi bagus
+    birthDateController.addListener(validateBirthDate);
     heightController.addListener(() => onHeightChanged(heightController.text));
     weightController.addListener(() => onWeightChanged(weightController.text));
   }
-
 
   @override
   void onClose() {

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +8,9 @@ class OnboardingController extends GetxController
   late AnimationController ac;
   late Animation<Offset> slideUp;
   final played = false.obs;
+
+  final GetStorage _storage = GetStorage();
+  static const String _hasSeenOnboardingKey = 'has_seen_onboarding';
 
   @override
   void onInit() {
@@ -19,11 +23,17 @@ class OnboardingController extends GetxController
     slideUp = Tween<Offset>(
       begin: Offset.zero,
       end: const Offset(0, -1.2),
-    ).animate(CurvedAnimation(parent: ac, curve: Curves.easeInOut));
+    ).animate(
+      CurvedAnimation(
+        parent: ac,
+        curve: Curves.easeInOut,
+      ),
+    );
 
-    ac.addStatusListener((status) {
+    ac.addStatusListener((status) async {
       if (status == AnimationStatus.completed && !played.value) {
         played.value = true;
+        await _storage.write(_hasSeenOnboardingKey, true);
         Get.offNamed('/login');
       }
     });

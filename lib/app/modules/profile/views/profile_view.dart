@@ -143,6 +143,7 @@ class ProfileView extends GetView<ProfileController> {
                     iconColor: Colors.red,
                     onTap: () {
                       // Logout action
+                      controller.logout();
                     },
                   ),
                 ],

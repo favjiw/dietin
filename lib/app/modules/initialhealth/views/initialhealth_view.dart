@@ -90,7 +90,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                         children: [
                                           GestureDetector(
                                             onTap: () =>
-                                                controller.selectGender('male'),
+                                                controller.selectGender('Male'),
                                             child: Container(
                                               width: 166.w,
                                               height: 65.h,
@@ -102,14 +102,14 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                                       controller
                                                               .selectedGender
                                                               .value ==
-                                                          'male'
+                                                          'Male'
                                                       ? 2.w
                                                       : 1.w,
                                                   color:
                                                       controller
                                                               .selectedGender
                                                               .value ==
-                                                          'male'
+                                                          'Male'
                                                       ? AppColors.primary
                                                       : AppColors.lightGrey,
                                                 ),
@@ -117,7 +117,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                                     controller
                                                             .selectedGender
                                                             .value ==
-                                                        'male'
+                                                        'Male'
                                                     ? AppColors.primary
                                                           .withValues(
                                                             alpha: 0.1,
@@ -135,7 +135,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                                           controller
                                                                   .selectedGender
                                                                   .value ==
-                                                              'male'
+                                                              'Male'
                                                           ? AppColors.primary
                                                           : AppColors.mainWhite,
                                                       child: Image.asset(
@@ -152,7 +152,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                                                 controller
                                                                         .selectedGender
                                                                         .value ==
-                                                                    'male'
+                                                                    'Male'
                                                                 ? AppColors
                                                                       .primary
                                                                 : Colors
@@ -166,7 +166,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                           ),
                                           GestureDetector(
                                             onTap: () => controller
-                                                .selectGender('female'),
+                                                .selectGender('Female'),
                                             child: Container(
                                               width: 166.w,
                                               height: 65.h,
@@ -178,14 +178,14 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                                       controller
                                                               .selectedGender
                                                               .value ==
-                                                          'female'
+                                                          'Female'
                                                       ? 2.w
                                                       : 1.w,
                                                   color:
                                                       controller
                                                               .selectedGender
                                                               .value ==
-                                                          'female'
+                                                          'Female'
                                                       ? AppColors.primary
                                                       : AppColors.lightGrey,
                                                 ),
@@ -193,7 +193,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                                     controller
                                                             .selectedGender
                                                             .value ==
-                                                        'female'
+                                                        'Female'
                                                     ? AppColors.primary
                                                           .withValues(
                                                             alpha: 0.1,
@@ -211,7 +211,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                                           controller
                                                                   .selectedGender
                                                                   .value ==
-                                                              'female'
+                                                              'Female'
                                                           ? AppColors.primary
                                                           : AppColors.mainWhite,
                                                       child: Image.asset(
@@ -228,7 +228,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                                                 controller
                                                                         .selectedGender
                                                                         .value ==
-                                                                    'female'
+                                                                    'Female'
                                                                 ? AppColors
                                                                       .primary
                                                                 : Colors
@@ -710,12 +710,12 @@ class InitialhealthView extends GetView<InitialhealthController> {
                                       ),
                                     );
                                   }),
-                            
+
                                   SizedBox(height: 25.h),
-                                  
+
                                   Obx(() {
                                     final sel = controller.allergies;
-                            
+
                                     Widget tile(String label, String asset) {
                                       final active = sel.contains(label);
                                       return GestureDetector(

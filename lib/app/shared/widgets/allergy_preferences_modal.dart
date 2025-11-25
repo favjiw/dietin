@@ -3,7 +3,6 @@ import 'package:dietin/app/shared/constants/text_style.dart';
 import 'package:dietin/app/shared/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:dietin/app/modules/profile_edit/controllers/profile_edit_controller.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
@@ -59,7 +58,7 @@ class AllergyPreferenceModal extends StatelessWidget {
                       color: active ? AppColors.primary : AppColors.lightGrey,
                     ),
                     color: active
-                        ? AppColors.primary.withOpacity(0.1)
+                        ? AppColors.primary.withValues(alpha: 0.1)
                         : Colors.transparent,
                   ),
                   child: Row(

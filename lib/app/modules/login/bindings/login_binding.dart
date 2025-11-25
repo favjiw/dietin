@@ -1,3 +1,4 @@
+import 'package:dietin/app/services/UserService.dart';
 import 'package:get/get.dart';
 
 import '../controllers/login_controller.dart';
@@ -7,6 +8,9 @@ class LoginBinding extends Bindings {
   void dependencies() {
     Get.lazyPut<LoginController>(
       () => LoginController(),
+    );
+    Get.lazyPut<UserServices>(
+          () => UserServices(),
     );
   }
 }

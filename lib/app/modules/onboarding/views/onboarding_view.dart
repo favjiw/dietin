@@ -66,7 +66,7 @@ class OnboardingView extends GetView<OnboardingController> {
                   CustomButton(
                     text: 'Mulai',
                     onPressed: () {
-                      Get.offNamed('/login');
+                      controller.start();
                     },
                     backgroundColor: AppColors.mainBlack,
                     borderRadius: 64,

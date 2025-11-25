@@ -121,16 +121,21 @@ class RegisterView extends GetView<RegisterController> {
                     ),
                   ),
                   SizedBox(height: 50.h),
+                  Obx(()=> controller.isLoading.value
+                      ? Center(child: CircularProgressIndicator())
+                      :
                   CustomButton(
                     text: 'Buat Akun',
-                    onPressed: () {},
+                    onPressed: () {
+                      controller.register();
+                    },
                     backgroundColor: AppColors.mainBlack,
                     borderRadius: 64,
                     textStyle: AppTextStyles.label.copyWith(
                       color: AppColors.light,
                       fontSize: 18.sp,
                     ),
-                  ),
+                  )),
                   SizedBox(height: 24.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
