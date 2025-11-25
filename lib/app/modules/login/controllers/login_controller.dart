@@ -25,8 +25,8 @@ class LoginController extends GetxController {
     if (emailController.text.trim().isEmpty ||
         passwordController.text.trim().isEmpty) {
       Get.snackbar(
-        'Terjadi Kesalahan',
-        'Harai isi semua data',
+        'Error',
+        'Please fill all fields',
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -42,30 +42,28 @@ class LoginController extends GetxController {
         password: passwordController.text.trim(),
       );
 
-      // simpan status login dan token
-      await _storage.write(_isLoggedInKey, true);
-      await _storage.write(_accessTokenKey, tokens.accessToken);
-      await _storage.write(_refreshTokenKey, tokens.refreshToken);
-
       print("Access: ${tokens.accessToken}");
       print("Refresh: ${tokens.refreshToken}");
 
+      final storage = GetStorage();
+      await storage.write('is_logged_in', true);
+      await storage.write('accessToken', tokens.accessToken);
+      await storage.write('refreshToken', tokens.refreshToken);
+
       Get.snackbar(
-        'Sukses',
-        'Berhasil login',
+        'Success',
+        'Login successful',
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
 
-      // bersihkan form
       emailController.clear();
       passwordController.clear();
 
       final bool isInitialCompleted =
-          _storage.read(_initialCompletedKey) == true;
+          storage.read('initial_health_completed') == true;
 
-      // alur setelah login
       if (isInitialCompleted) {
         Get.offAllNamed('/botnavbar');
       } else {
@@ -73,12 +71,12 @@ class LoginController extends GetxController {
       }
     } catch (e) {
       Get.snackbar(
-        'Gagal Login',
+        'Login Failed',
         e.toString(),
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.red,
         colorText: Colors.white,
-        duration: Duration(seconds: 5),
+        duration: const Duration(seconds: 5),
       );
       print('Login error: $e');
     } finally {

@@ -30,63 +30,81 @@ class HomeView extends GetView<HomeController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 11.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        CircleAvatar(
-                          radius: 30.r,
-                          backgroundImage: AssetImage(
-                            'assets/images/male_ic.png',
+
+                // header user + notif, pakai data dari HomeController
+                Obx(() {
+                  final isLoading = controller.isLoading.value;
+                  final user = controller.user.value;
+                  final error = controller.errorMessage.value;
+
+                  String displayName = 'Pengguna';
+                  if (isLoading) {
+                    displayName = 'Memuat...';
+                  } else if (error.isNotEmpty) {
+                    displayName = 'Gagal memuat';
+                  } else if (user != null && user.name.isNotEmpty) {
+                    displayName = user.name;
+                  }
+
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 30.r,
+                            backgroundImage: const AssetImage(
+                              'assets/images/male_ic.png',
+                            ),
+                            backgroundColor: AppColors.primary,
                           ),
-                          backgroundColor: AppColors.primary,
-                        ),
-                        SizedBox(width: 10.h),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Selamat datang! ',
-                                  style: AppTextStyles.bodySmall,
-                                ),
-                                Image.asset(
-                                  'assets/images/hand_ic.png',
-                                  width: 14.w,
-                                  height: 14.h,
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              'John Doe',
-                              style: AppTextStyles.bodySmallSemiBold,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    CircleAvatar(
-                      radius: 25.r,
-                      backgroundColor: AppColors.mainWhite,
-                      child: IconButton(
-                        onPressed: () {
-                          Get.toNamed('/notification');
-                        },
-                        icon: SvgPicture.asset(
-                          'assets/images/notif_ic.svg',
-                          width: 25.w,
-                          height: 25.h,
+                          SizedBox(width: 10.h),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Selamat datang! ',
+                                    style: AppTextStyles.bodySmall,
+                                  ),
+                                  Image.asset(
+                                    'assets/images/hand_ic.png',
+                                    width: 14.w,
+                                    height: 14.h,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 4.h),
+                              Text(
+                                displayName,
+                                style: AppTextStyles.bodySmallSemiBold,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      CircleAvatar(
+                        radius: 25.r,
+                        backgroundColor: AppColors.mainWhite,
+                        child: IconButton(
+                          onPressed: () {
+                            Get.toNamed('/notification');
+                          },
+                          icon: SvgPicture.asset(
+                            'assets/images/notif_ic.svg',
+                            width: 25.w,
+                            height: 25.h,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  );
+                }),
+
                 SizedBox(height: 24.h),
                 Text('Asupan Harian', style: AppTextStyles.labelBold),
                 SizedBox(height: 16.h),
@@ -146,7 +164,6 @@ class HomeView extends GetView<HomeController> {
                     //open container if food added
                     Container(
                       width: 1.sw,
-                      // height: .h,
                       padding: EdgeInsets.symmetric(horizontal: 12.w),
                       decoration: BoxDecoration(
                         color: AppColors.mainWhite,
@@ -155,28 +172,26 @@ class HomeView extends GetView<HomeController> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          //spacing
                           SizedBox(height: 95.h),
-                          //food item row
                           ListView.builder(
                             shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
+                            physics: const NeverScrollableScrollPhysics(),
                             itemCount: 5,
                             itemBuilder: (context, index) {
                               return Column(
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                     children: [
-                                      //food column
                                       Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             'Nasi  Putih',
-                                            style: AppTextStyles.bodySmallSemiBold,
+                                            style:
+                                            AppTextStyles.bodySmallSemiBold,
                                           ),
                                           SizedBox(height: 4.h),
                                           Text(
@@ -185,10 +200,9 @@ class HomeView extends GetView<HomeController> {
                                           ),
                                         ],
                                       ),
-                                      //calorie row
                                       Row(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                        CrossAxisAlignment.center,
                                         children: [
                                           Text(
                                             '90 kkal',
@@ -198,7 +212,8 @@ class HomeView extends GetView<HomeController> {
                                           InkWell(
                                             onTap: () {},
                                             child: Icon(
-                                              Icons.keyboard_arrow_right_rounded,
+                                              Icons
+                                                  .keyboard_arrow_right_rounded,
                                               color: AppColors.lightGrey,
                                             ),
                                           ),
@@ -232,12 +247,10 @@ class HomeView extends GetView<HomeController> {
                           ),
                         ],
                       ),
-                      //main row
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          //left row
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -257,11 +270,9 @@ class HomeView extends GetView<HomeController> {
                               ),
                             ],
                           ),
-                          //right row
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              //calorie column
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
@@ -296,7 +307,6 @@ class HomeView extends GetView<HomeController> {
                     ),
                   ],
                 ),
-                //Spacing
                 SizedBox(height: 9.h),
                 Container(
                   width: 1.sw,
@@ -315,12 +325,10 @@ class HomeView extends GetView<HomeController> {
                       ),
                     ],
                   ),
-                  //main row
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      //left row
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -340,11 +348,9 @@ class HomeView extends GetView<HomeController> {
                           ),
                         ],
                       ),
-                      //right row
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          //calorie column
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
@@ -387,12 +393,10 @@ class HomeView extends GetView<HomeController> {
                       ),
                     ],
                   ),
-                  //main row
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      //left row
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -412,11 +416,9 @@ class HomeView extends GetView<HomeController> {
                           ),
                         ],
                       ),
-                      //right row
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          //calorie column
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
