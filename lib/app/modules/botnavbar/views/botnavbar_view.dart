@@ -17,22 +17,22 @@ import '../controllers/botnavbar_controller.dart';
 
 class BotnavbarView extends GetView<BotnavbarController> {
   const BotnavbarView({super.key});
+
   @override
   Widget build(BuildContext context) {
-    Get.lazyPut(() => HomeController(), fenix: true);
-    Get.lazyPut(() => MealsController(), fenix: true);
-    Get.lazyPut(() => StatisticsController(), fenix: true);
-    Get.lazyPut(() => ProfileController(), fenix: true);
+    // Controller tidak didaftarkan di sini lagi
+    // Binding akan menangani semua lazyPut
 
-    final List<Widget> pages = [
+    final List<Widget> pages = const [
       HomeView(),
       MealsView(),
-      Container(color: Colors.green),
+      SizedBox(), // halaman tengah untuk scan, sementara kosong
       StatisticsView(),
       ProfileView(),
     ];
+
     return Obx(
-      () => Scaffold(
+          () => Scaffold(
         backgroundColor: AppColors.secondaryWhite,
         body: pages[controller.currentIndex.value],
         bottomNavigationBar: SizedBox(
