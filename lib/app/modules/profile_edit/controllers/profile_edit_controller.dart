@@ -1,33 +1,115 @@
-import 'package:flutter/cupertino.dart';
+import 'package:dietin/app/data/UserModel.dart';
+import 'package:dietin/app/modules/profile/controllers/profile_controller.dart';
+import 'package:dietin/app/services/UserService.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ProfileEditController extends GetxController {
+  final UserServices _userServices = Get.find<UserServices>();
+
+  // Text Controllers
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController birthDateController = TextEditingController();
   TextEditingController heightController = TextEditingController();
   TextEditingController weightController = TextEditingController();
 
-  var fullName = 'Gilang Nanda Saputra'.obs;
-  var email = 'gilangrajagula@gmail.com'.obs;
-  var birthDate = '69 Februari 1907'.obs;
-  var height = '160'.obs;
-  var weight = '61'.obs;
+  // Observable Status
+  var user = Rxn<UserModel>();
+  var isLoading = false.obs;
+  var isSaving = false.obs;
+  var errorMessage = ''.obs;
 
+  // Observable Data (untuk sinkronisasi UI)
+  var fullName = ''.obs;
+  var email = ''.obs;
+  var birthDate = ''.obs;
+  var height = ''.obs;
+  var weight = ''.obs;
   RxList<String> allergies = <String>[].obs;
   List<String> get selectedAllergies => allergies;
-
 
   // init textfield with current values
   @override
   void onInit() {
     super.onInit();
+    fetchUserProfile();
+  }
+
+  void _syncControllers(UserModel fetchedUser) {
+    fullName.value = fetchedUser.name;
+    email.value = fetchedUser.email;
+    birthDate.value = fetchedUser.birthDate != null
+        ? fetchedUser.birthDate!.toLocal().toString().split(' ')[0] // Format sederhana YYYY-MM-DD
+        : '';
+    height.value = fetchedUser.height?.toString() ?? '';
+    weight.value = fetchedUser.weight?.toString() ?? '';
+    allergies.assignAll(fetchedUser.allergies);
+
     fullNameController.text = fullName.value;
     emailController.text = email.value;
     birthDateController.text = birthDate.value;
     heightController.text = height.value;
     weightController.text = weight.value;
   }
+
+  Future<void> fetchUserProfile() async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+
+      final data = await _userServices.fetchUserProfile();
+      final fetchedUser = UserModel.fromJson(data);
+      user.value = fetchedUser;
+
+      _syncControllers(fetchedUser);
+
+      print('[ProfileEditController] User profile fetched successfully.');
+    } catch (e) {
+      errorMessage.value = e.toString();
+      print('[ProfileEditController] Error fetching user profile: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // TODO: Hubungkan fungsi ini ke UserService.updateProfile (endpoint belum ada)
+  Future<void> updateProfile() async {
+    if (fullNameController.text.isEmpty || emailController.text.isEmpty) {
+      Get.snackbar('Error', 'Nama dan Email tidak boleh kosong.', snackPosition: SnackPosition.TOP, backgroundColor: Colors.red, colorText: Colors.white);
+      return;
+    }
+
+    try {
+      isSaving.value = true;
+      errorMessage.value = '';
+
+      // --- Simulasi Update API (Ganti dengan panggilan API sebenarnya) ---
+      await Future.delayed(const Duration(seconds: 2));
+
+      // Simulasi berhasil: update state lokal dan berikan notifikasi
+      fullName.value = fullNameController.text.trim();
+      email.value = emailController.text.trim();
+      height.value = heightController.text.trim();
+      weight.value = weightController.text.trim();
+      birthDate.value = birthDateController.text.trim(); // asumsikan format valid
+      // Note: Di dunia nyata, Anda harus mengirim data ini ke server.
+
+      Get.snackbar('Berhasil', 'Profil berhasil diperbarui.', snackPosition: SnackPosition.TOP, backgroundColor: Colors.green, colorText: Colors.white);
+
+      // Update data di ProfileController (jika ada di hirarki sebelumnya)
+      if (Get.isRegistered<ProfileController>()) {
+        Get.find<ProfileController>().fetchUser();
+      }
+
+    } catch (e) {
+      errorMessage.value = e.toString();
+      Get.snackbar('Gagal', 'Gagal menyimpan profil: $e', snackPosition: SnackPosition.TOP, backgroundColor: Colors.red, colorText: Colors.white);
+    } finally {
+      isSaving.value = false;
+    }
+  }
+
 
   final List<String> allAllergyOptions = [
     'Susu, Telur, dan Produk Susu Lainnya',
@@ -70,10 +152,4 @@ class ProfileEditController extends GetxController {
       allergies.add(allergy);
     }
   }
-
-  void updateFullName(String value) => fullName.value = value;
-  void updateEmail(String value) => email.value = value;
-  void updateBirthDate(String value) => birthDate.value = value;
-  void updateHeight(String value) => height.value = value;
-  void updateWeight(String value) => weight.value = value;
 }
