@@ -57,107 +57,159 @@ class MealsView extends GetView<MealsController> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: 10,
-                        itemBuilder: (context, index) {
-                          return InkWell(
-                            onTap: () {
-                              Get.toNamed('/detail-food');
-                            },
-                            child: Container(
-                              width: 1.sw,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 8.w,
-                                vertical: 10.h,
-                              ),
-                              margin: EdgeInsets.only(bottom: 12.h),
-                              decoration: BoxDecoration(
-                                color: AppColors.mainWhite,
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                              // main row
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                      Obx(() {
+                        // Loading state
+                        if (controller.isLoading.value) {
+                          return Padding(
+                            padding: EdgeInsets.only(top: 50.h),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
+
+                        // Empty state
+                        if (controller.filteredList.isEmpty) {
+                          return Center(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 50.h),
+                              child: Column(
                                 children: [
-                                  //     left row
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 25.r,
-                                        backgroundColor: Colors.transparent,
-                                        backgroundImage: NetworkImage(
-                                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTec8zUfRIhICBszXhD7Fv7jAyTKRe7dkAYpQ&s',
-                                        ),
-                                      ),
-                                      SizedBox(width: 12.w),
-                                      Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Pizza Mozarella',
-                                            style: AppTextStyles.labelBold,
-                                          ),
-                                          SizedBox(height: 4.h),
-                                          Row(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              SvgPicture.asset(
-                                                'assets/images/fire_ic.svg',
-                                                width: 13.w,
-                                                height: 18.h,
-                                              ),
-                                              SizedBox(width: 2.w,),
-                                              Text(
-                                                '120 kkal',
-                                                style: AppTextStyles.bodySmall,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                  Image.asset(
+                                    'assets/images/empty_img.png',
+                                    width: 150.w,
+                                    color: Colors.grey.shade300,
+                                    colorBlendMode: BlendMode.srcIn,
                                   ),
-                                //   right column
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 5.w,
-                                          vertical: 3.h
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.primary,
-                                          borderRadius: BorderRadius.circular(16.r)
-                                        ),
-                                        child: Row(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Text('Rekomendasi', style: AppTextStyles.recom,),
-                                            SizedBox(width: 10.w,),
-                                            SvgPicture.asset(
-                                              'assets/images/recom_ic.svg',
-                                              width: 12.w,
-                                              height: 12.h,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(height: 12.h,),
-                                      Text('100 gr', style: AppTextStyles.bodyLight,)
-                                    ],
+                                  SizedBox(height: 16.h),
+                                  Text(
+                                    'Tidak ada makanan ditemukan',
+                                    style: AppTextStyles.bodyLight,
                                   ),
                                 ],
                               ),
                             ),
                           );
-                        },
-                      ),
+                        }
+
+                        // List Data
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: controller.filteredList.length,
+                          itemBuilder: (context, index) {
+                            final food = controller.filteredList[index];
+
+                            return InkWell(
+                              onTap: () {
+                                // Arahkan ke detail page
+                                // Anda bisa mengirim argumen food di sini
+                                Get.toNamed('/detail-food', arguments: food);
+                              },
+                              child: Container(
+                                width: 1.sw,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8.w,
+                                  vertical: 10.h,
+                                ),
+                                margin: EdgeInsets.only(bottom: 12.h),
+                                decoration: BoxDecoration(
+                                  color: AppColors.mainWhite,
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                                // main row
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    //     left row
+                                    Expanded(
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 25.r,
+                                            backgroundColor: Colors.grey.shade200,
+                                            backgroundImage: (food.imageUrl != null && food.imageUrl!.isNotEmpty)
+                                                ? NetworkImage(food.imageUrl!)
+                                                : const AssetImage('assets/images/empty_img.png') as ImageProvider,
+                                          ),
+                                          SizedBox(width: 12.w),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  food.name,
+                                                  style: AppTextStyles.labelBold,
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                                SizedBox(height: 4.h),
+                                                Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    SvgPicture.asset(
+                                                      'assets/images/fire_ic.svg',
+                                                      width: 13.w,
+                                                      height: 18.h,
+                                                    ),
+                                                    SizedBox(width: 2.w,),
+                                                    Text(
+                                                      food.calories, // Mengambil dari getter di model
+                                                      style: AppTextStyles.bodySmall,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    //   right column
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 5.w,
+                                              vertical: 3.h
+                                          ),
+                                          decoration: BoxDecoration(
+                                              color: AppColors.primary,
+                                              borderRadius: BorderRadius.circular(16.r)
+                                          ),
+                                          child: Row(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Text('Rekomendasi', style: AppTextStyles.recom,),
+                                              SizedBox(width: 10.w,),
+                                              SvgPicture.asset(
+                                                'assets/images/recom_ic.svg',
+                                                width: 12.w,
+                                                height: 12.h,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(height: 12.h,),
+                                        Text(
+                                          food.servings != null
+                                              ? '${food.servings} Porsi'
+                                              : '1 Porsi',
+                                          style: AppTextStyles.bodyLight,
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      }),
                     ],
                   ),
                 ],
