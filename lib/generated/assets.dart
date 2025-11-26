@@ -6,6 +6,7 @@ class Assets {
   static const String imagesArrowUpLeftIc = 'assets/images/arrow_up_left_ic.svg';
   static const String imagesCarbIc = 'assets/images/carb_ic.png';
   static const String imagesCmIc = 'assets/images/cm_ic.png';
+  static const String imagesDaging = 'assets/images/daging.png';
   static const String imagesEmptyImg = 'assets/images/empty_img.png';
   static const String imagesFatIc = 'assets/images/fat_ic.png';
   static const String imagesFemaleIc = 'assets/images/female_ic.png';
@@ -17,7 +18,12 @@ class Assets {
   static const String imagesHistoryIc = 'assets/images/history_ic.svg';
   static const String imagesHomeActIc = 'assets/images/home_act_ic.svg';
   static const String imagesHomeInacIc = 'assets/images/home_inac_ic.svg';
+  static const String imagesIkan = 'assets/images/ikan.png';
   static const String imagesInfoIc = 'assets/images/info_ic.png';
+  static const String imagesKacang = 'assets/images/kacang.png';
+  static const String imagesKedelai = 'assets/images/kedelai.png';
+  static const String imagesKgIc = 'assets/images/kg_ic.png';
+  static const String imagesLogoBuild = 'assets/images/logo_build.png';
   static const String imagesLogoImg = 'assets/images/logo_img.svg';
   static const String imagesLogoImgSage = 'assets/images/logo_img_sage.svg';
   static const String imagesLoveIc = 'assets/images/love_ic.svg';
@@ -33,6 +39,7 @@ class Assets {
   static const String imagesProfileInacIc = 'assets/images/profile_inac_ic.svg';
   static const String imagesProteinIc = 'assets/images/protein_ic.png';
   static const String imagesRecomIc = 'assets/images/recom_ic.svg';
+  static const String imagesRoti = 'assets/images/roti.png';
   static const String imagesScanIc = 'assets/images/scan_ic.svg';
   static const String imagesSearchIc = 'assets/images/search_ic.svg';
   static const String imagesShareIc = 'assets/images/share_ic.svg';
@@ -41,7 +48,11 @@ class Assets {
   static const String imagesSunIc = 'assets/images/sun_ic.svg';
   static const String imagesSunriseIc = 'assets/images/sunrise_ic.svg';
   static const String imagesSunsetIc = 'assets/images/sunset_ic.svg';
+  static const String imagesSusu = 'assets/images/susu.png';
+  static const String imagesTehdankopi = 'assets/images/tehdankopi.png';
+  static const String imagesUdang = 'assets/images/udang.png';
   static const String imagesUserIcon = 'assets/images/user_icon.svg';
   static const String imagesWarningIc = 'assets/images/warning_ic.svg';
+  static const String imagesWijen = 'assets/images/wijen.png';
 
 }

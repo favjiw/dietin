@@ -19,6 +19,7 @@ dependencies:
   intl: ^0.20.2
   fl_chart: ^0.69.0
   get_storage: ^2.1.1
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -32,6 +33,25 @@ flutter:
 
   assets:
     - assets/images/
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo_build.png"
+  min_sdk_android: 21 # Sesuaikan dengan minSdkVersion di proyek Android Anda
+  remove_alpha_ios: true # Opsional: Menghapus transparansi pada iOS (direkomendasikan Apple)
+  web:
+    generate: true
+    image_path: "assets/images/logo_build.png"
+    background_color: "#FFFFFF"
+    theme_color: "#87B8B5" # Mengambil warna primary dari AppColors
+  windows:
+    generate: true
+    image_path: "assets/images/logo_build.png"
+    icon_size: 48 # Opsional, ukuran ikon default Windows
+  macos:
+    generate: true
+    image_path: "assets/images/logo_build.png"
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
