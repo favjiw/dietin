@@ -19,39 +19,16 @@ class SearchFoodView extends GetView<SearchFoodController> {
         statusBarIconBrightness: Brightness.dark,
       ),
     );
-    final List<Map<String, String>> foods = [
-      {
-        'name': 'Nasi Goreng (Sukarasa)',
-        'portion': '100 gram (g)',
-        'calorie': '400 kkal',
-      },
-      {
-        'name': 'Nasi Goreng (Betuah)',
-        'portion': '100 gram (g)',
-        'calorie': '490 kkal',
-      },
-      {
-        'name': 'Nasi Goreng (ITHB)',
-        'portion': '100 gram (g)',
-        'calorie': '400 kkal',
-      },
-      {
-        'name': 'Nasi Goreng Spesial (Tianlala)',
-        'portion': '100 gram (g)',
-        'calorie': '560 kkal',
-      },
-      {
-        'name': 'Nasi Goreng Hitam (Bingung)',
-        'portion': '100 gram (g)',
-        'calorie': '390 kkal',
-      },
-      {
-        'name': 'Nasi Lupa Goreng (Njir)',
-        'portion': '100 gram (g)',
-        'calorie': '400 kkal',
-      },
-    ];
-    controller.initCheckList(foods.length);
+
+    // Map MealType ke Bahasa Indonesia untuk judul
+    String title = 'Tambah Makanan';
+    // Akses aman ke mealType, gunakan default jika belum diinisialisasi (walaupun onInit sudah handle)
+    try {
+      if (controller.mealType == 'Breakfast') title = 'Tambah Sarapan';
+      if (controller.mealType == 'Lunch') title = 'Tambah Makan Siang';
+      if (controller.mealType == 'Dinner') title = 'Tambah Makan Malam';
+    } catch (_) {}
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -59,7 +36,7 @@ class SearchFoodView extends GetView<SearchFoodController> {
       child: Scaffold(
         backgroundColor: AppColors.mainWhite,
         appBar: AppBar(
-          title: Text('Tambah Makanan', style: AppTextStyles.headingAppBar),
+          title: Text(title, style: AppTextStyles.headingAppBar),
           backgroundColor: AppColors.mainWhite,
           surfaceTintColor: AppColors.mainWhite,
           elevation: 0,
@@ -73,196 +50,194 @@ class SearchFoodView extends GetView<SearchFoodController> {
               Get.back();
             },
           ),
+          actions: [
+            // Tombol Simpan di AppBar (Icon Ceklis)
+            Obx(() {
+              if (controller.isSubmitting.value) {
+                return Padding(
+                  padding: EdgeInsets.only(right: 16.w),
+                  child: SizedBox(
+                      width: 20.w,
+                      height: 20.w,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary)
+                  ),
+                );
+              }
+
+              // Tampilkan ceklis hanya jika ada yang dipilih
+              // selectedCount adalah getter yang mengakses selectedItems, jadi reaktif di dalam Obx
+              if (controller.selectedCount > 0) {
+                return IconButton(
+                  onPressed: () => controller.submitLog(),
+                  icon: Icon(Icons.check_rounded, color: AppColors.primary, size: 28.sp),
+                );
+              }
+
+              return SizedBox.shrink();
+            })
+          ],
         ),
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CustomTextField(
-                    hintText: 'Cari makanan...',
-                    controller: controller.searchController,
-                    suffixIcon: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10.h,
-                        vertical: 10.w,
-                      ),
-                      child: SvgPicture.asset(
-                        'assets/images/search_ic.svg',
-                        width: 24.w,
-                        height: 24.h,
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomTextField(
+                      hintText: 'Cari makanan...',
+                      controller: controller.searchController,
+                      suffixIcon: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10.h,
+                          vertical: 10.w,
+                        ),
+                        child: SvgPicture.asset(
+                          'assets/images/search_ic.svg',
+                          width: 24.w,
+                          height: 24.h,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 13.h),
-                  //If Search Result Not Empty
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: foods.length,
+                    SizedBox(height: 13.h),
+                  ],
+                ),
+              ),
+
+              // List Makanan (Expanded agar scrollable dan mengisi sisa ruang)
+              Expanded(
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (controller.filteredFoods.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset('assets/images/empty_img.png', width: 200.w, height: 200.h),
+                          SizedBox(height: 16.h),
+                          Text('Makanan tidak ditemukan', style: AppTextStyles.bodyLight),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                    itemCount: controller.filteredFoods.length,
                     itemBuilder: (context, index) {
-                      final food = foods[index];
-                      return Obx(() =>
-                        InkWell(
-                        onTap: () {
-                          controller.toggleCheck(index);
-                        },
-                        child: Container(
-                          width: 1.sw,
-                          padding: EdgeInsets.symmetric(vertical: 12.h),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: AppColors.lightGrey,
-                                width: 1,
+                      final food = controller.filteredFoods[index];
+
+                      // BUNGKUS ITEM DENGAN OBX AGAR REAKTIF PER ITEM
+                      return Obx(() {
+                        final isChecked = controller.isSelected(food.id);
+
+                        return InkWell(
+                          onTap: () {
+                            controller.toggleSelection(food.id);
+                          },
+                          child: Container(
+                            width: 1.sw,
+                            padding: EdgeInsets.symmetric(vertical: 12.h),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: AppColors.lightGrey.withValues(alpha: 0.3),
+                                  width: 1,
+                                ),
                               ),
                             ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      food['name'] ?? '',
-                                      style: AppTextStyles.labelSearch,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    SizedBox(height: 4.h),
-                                    RichText(
-                                      text: TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: '${food['portion']} ',
-                                            style: AppTextStyles.bodyLight
-                                                .copyWith(
-                                              color: AppColors.primary,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: food['calorie'] ?? '',
-                                            style: AppTextStyles.bodyLight,
-                                          ),
-                                        ],
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        food.name,
+                                        style: AppTextStyles.labelSearch,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(width: 12.w),
-                              Container(
-                                width: 20.w,
-                                height: 20.w,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(4.r),
-                                  border: Border.all(
-                                    color: controller.checkedList[index]
-                                        ? AppColors.primary
-                                        : AppColors.lightGrey,
-                                    width: 1.5,
+                                      SizedBox(height: 4.h),
+                                      RichText(
+                                        text: TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: '${food.servings ?? 1} Porsi ',
+                                              style: AppTextStyles.bodyLight.copyWith(
+                                                color: AppColors.primary,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: '${food.calories} kkal', // Asumsi helper calories ada di FoodModel
+                                              style: AppTextStyles.bodyLight,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  color: controller.checkedList[index]
-                                      ? AppColors.primary.withValues(alpha: 0.2)
-                                      : Colors.transparent,
                                 ),
-                                child: controller.checkedList[index]
-                                    ? Icon(
-                                  Icons.check,
-                                  size: 16.w,
-                                  color: AppColors.primary,
-                                )
-                                    : null,
-                              ),
-                            ],
+                                SizedBox(width: 12.w),
+                                // Checkbox Custom
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  width: 24.w,
+                                  height: 24.w,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(6.r),
+                                    border: Border.all(
+                                      color: isChecked
+                                          ? AppColors.primary
+                                          : AppColors.lightGrey,
+                                      width: 2,
+                                    ),
+                                    color: isChecked
+                                        ? AppColors.primary
+                                        : Colors.transparent,
+                                  ),
+                                  child: isChecked
+                                      ? Icon(
+                                    Icons.check,
+                                    size: 16.w,
+                                    color: Colors.white,
+                                  )
+                                      : null,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ));
+                        );
+                      });
                     },
-                  ),
-                  //If Empty
-                  // Center(
-                  //   child: Column(
-                  //     crossAxisAlignment: CrossAxisAlignment.center,
-                  //     mainAxisAlignment: MainAxisAlignment.center,
-                  //     children: [
-                  //       Image.asset('assets/images/empty_img.png', width: 250.w, height: 250.h,),
-                  //       Text('Riwayat makanan masih kosong', style: AppTextStyles.bodyLight,),
-                  //     ],
-                  //   ),
-                  // ),
-                  //If history available
-                  // ListView.builder(
-                  //   shrinkWrap: true,
-                  //   physics: const NeverScrollableScrollPhysics(),
-                  //   itemCount: 15,
-                  //   itemBuilder: (context, index) {
-                  //     return InkWell(
-                  //       onTap: () {},
-                  //       child: Container(
-                  //         width: 1.sw,
-                  //         padding: EdgeInsets.symmetric(vertical: 16.h),
-                  //         decoration: BoxDecoration(
-                  //           border: Border(
-                  //             bottom: BorderSide(
-                  //               color: AppColors.lightGrey,
-                  //               width: 1,
-                  //             ),
-                  //           ),
-                  //         ),
-                  //         child: Row(
-                  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //           children: [
-                  //             //first row
-                  //             Row(
-                  //               crossAxisAlignment: CrossAxisAlignment.center,
-                  //               children: [
-                  //                 SvgPicture.asset(
-                  //                   'assets/images/history_ic.svg',
-                  //                   width: 24.w,
-                  //                   height: 24.h,
-                  //                 ),
-                  //                 SizedBox(width: 12.w),
-                  //                 Text(
-                  //                   'Nasi Putih',
-                  //                   style: AppTextStyles.labelSearch,
-                  //                 ),
-                  //               ],
-                  //             ),
-                  //             //second row
-                  //             SvgPicture.asset(
-                  //               'assets/images/arrow_up_left_ic.svg',
-                  //               width: 24.w,
-                  //               height: 24.h,
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
-                ],
+                  );
+                }),
               ),
-            ),
+            ],
           ),
         ),
+        // Floating Action Button (Scan) tetap dipertahankan jika perlu
         floatingActionButton: FloatingActionButton(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25.r),
           ),
           backgroundColor: AppColors.primary,
-          onPressed: () {},
+          onPressed: () {
+            // TODO: Implement Scan Feature
+          },
           child: SvgPicture.asset(
             'assets/images/scan_ic.svg',
             width: 32.w,
             height: 32.h,
           ),
+        ),
       ),
-    ));
+    );
   }
 }

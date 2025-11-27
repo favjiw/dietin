@@ -1,443 +1,348 @@
+import 'package:dietin/app/data/FoodLogModel.dart';
+import 'package:dietin/app/data/FoodModel.dart';
+import 'package:dietin/app/data/UserModel.dart';
+import 'package:dietin/app/services/FoodLogService.dart';
+import 'package:dietin/app/services/UserService.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart'; // Import this
 
 class StatisticsController extends GetxController {
-  //TODO: Implement StatisticsController
+  var isLoading = false.obs;
 
-  final count = 0.obs;
+  // --- State UI ---
   final selectedTab = 0.obs; // 0: Hari, 1: Minggu, 2: Bulan
   final selectedNutrient = 'Kalori'.obs;
   final touchedIndex = (-1).obs;
-  final selectedDayIndex = (-1).obs; // -1 berarti tidak ada yang dipilih
-  final selectedMonth = 'November'.obs;
-  final selectedYear = '2025'.obs;
-  final currentDateRangeIndex = 0.obs; // Index untuk rentang tanggal (0-based)
+  final selectedDayIndex = (-1).obs;
 
+  // Changed: Initialize with empty string to avoid LocaleDataException before init
+  final selectedMonth = ''.obs;
+  final selectedYear = DateTime.now().year.toString().obs;
+
+  final currentDateRangeIndex = 0.obs;
+
+  // --- Data Master ---
+  // Menyimpan semua log mentah dari API
+  var allLogs = <FoodLogModel>[].obs;
+
+  // Data User untuk BMI
+  var user = Rxn<UserModel>();
+  var bmiValue = 0.0.obs;
+  var bmiStatus = ''.obs;
+
+  // --- Konstanta ---
   final List<String> nutrients = ['Kalori', 'Protein', 'Karbohidrat', 'Lemak'];
   final List<String> months = [
-    'Januari',
-    'Februari',
-    'Maret',
-    'April',
-    'Mei',
-    'Juni',
-    'Juli',
-    'Agustus',
-    'September',
-    'Oktober',
-    'November',
-    'Desember',
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
   ];
-  final List<String> years = ['2023', '2024', '2025'];
-  final List<String> weekDays = [
-    'Min',
-    'Sen',
-    'Sel',
-    'Rab',
-    'Kam',
-    'Jum',
-    'Sab',
-  ];
+  final List<String> years = ['2023', '2024', '2025', '2026'];
+  final List<String> weekDays = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
 
-  // Data untuk pie chart (contoh data)
-  Map<String, Map<String, dynamic>> get nutritionData => {
-    'Kalori': {
-      'total': 2000,
-      'consumed': 1500,
-      'sections': [
-        {'label': 'Sarapan', 'value': 500},
-        {'label': 'Makan Siang', 'value': 600},
-        {'label': 'Makan Malam', 'value': 400},
-      ],
-    },
-    'Protein': {
-      'total': 150,
-      'consumed': 100,
-      'sections': [
-        {'label': 'Sarapan', 'value': 30},
-        {'label': 'Makan Siang', 'value': 45},
-        {'label': 'Makan Malam', 'value': 25},
-      ],
-    },
-    'Karbohidrat': {
-      'total': 300,
-      'consumed': 220,
-      'sections': [
-        {'label': 'Sarapan', 'value': 80},
-        {'label': 'Makan Siang', 'value': 90},
-        {'label': 'Makan Malam', 'value': 50},
-      ],
-    },
-    'Lemak': {
-      'total': 70,
-      'consumed': 50,
-      'sections': [
-        {'label': 'Sarapan', 'value': 15},
-        {'label': 'Makan Siang', 'value': 20},
-        {'label': 'Makan Malam', 'value': 15},
-      ],
-    },
-  };
-
-  // Data untuk bar chart mingguan
-  Map<String, Map<String, dynamic>> get weeklyNutritionData => {
-    'Kalori': {
-      'total': 2000,
-      'days': [
-        {
-          'day': 'Minggu',
-          'value': 1800,
-          'percentage': 0.9,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 600},
-            {'label': 'Makan Siang', 'value': 700},
-            {'label': 'Makan Malam', 'value': 500},
-          ],
-        },
-        {
-          'day': 'Senin',
-          'value': 1500,
-          'percentage': 0.75,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 500},
-            {'label': 'Makan Siang', 'value': 600},
-            {'label': 'Makan Malam', 'value': 400},
-          ],
-        },
-        {
-          'day': 'Selasa',
-          'value': 1200,
-          'percentage': 0.6,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 400},
-            {'label': 'Makan Siang', 'value': 500},
-            {'label': 'Makan Malam', 'value': 300},
-          ],
-        },
-        {
-          'day': 'Rabu',
-          'value': 1600,
-          'percentage': 0.8,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 550},
-            {'label': 'Makan Siang', 'value': 650},
-            {'label': 'Makan Malam', 'value': 400},
-          ],
-        },
-        {
-          'day': 'Kamis',
-          'value': 1400,
-          'percentage': 0.7,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 450},
-            {'label': 'Makan Siang', 'value': 550},
-            {'label': 'Makan Malam', 'value': 400},
-          ],
-        },
-        {
-          'day': 'Jumat',
-          'value': 1100,
-          'percentage': 0.55,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 350},
-            {'label': 'Makan Siang', 'value': 450},
-            {'label': 'Makan Malam', 'value': 300},
-          ],
-        },
-        {
-          'day': 'Sabtu',
-          'value': 1900,
-          'percentage': 0.95,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 650},
-            {'label': 'Makan Siang', 'value': 750},
-            {'label': 'Makan Malam', 'value': 500},
-          ],
-        },
-      ],
-    },
-    'Protein': {
-      'total': 150,
-      'days': [
-        {
-          'day': 'Minggu',
-          'value': 120,
-          'percentage': 0.8,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 40},
-            {'label': 'Makan Siang', 'value': 50},
-            {'label': 'Makan Malam', 'value': 30},
-          ],
-        },
-        {
-          'day': 'Senin',
-          'value': 100,
-          'percentage': 0.67,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 30},
-            {'label': 'Makan Siang', 'value': 45},
-            {'label': 'Makan Malam', 'value': 25},
-          ],
-        },
-        {
-          'day': 'Selasa',
-          'value': 90,
-          'percentage': 0.6,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 25},
-            {'label': 'Makan Siang', 'value': 40},
-            {'label': 'Makan Malam', 'value': 25},
-          ],
-        },
-        {
-          'day': 'Rabu',
-          'value': 110,
-          'percentage': 0.73,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 35},
-            {'label': 'Makan Siang', 'value': 45},
-            {'label': 'Makan Malam', 'value': 30},
-          ],
-        },
-        {
-          'day': 'Kam',
-          'value': 95,
-          'percentage': 0.63,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 30},
-            {'label': 'Makan Siang', 'value': 40},
-            {'label': 'Makan Malam', 'value': 25},
-          ],
-        },
-        {
-          'day': 'Jum',
-          'value': 85,
-          'percentage': 0.57,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 25},
-            {'label': 'Makan Siang', 'value': 35},
-            {'label': 'Makan Malam', 'value': 25},
-          ],
-        },
-        {
-          'day': 'Sab',
-          'value': 130,
-          'percentage': 0.87,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 45},
-            {'label': 'Makan Siang', 'value': 55},
-            {'label': 'Makan Malam', 'value': 30},
-          ],
-        },
-      ],
-    },
-    'Karbohidrat': {
-      'total': 300,
-      'days': [
-        {
-          'day': 'Minggu',
-          'value': 250,
-          'percentage': 0.83,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 80},
-            {'label': 'Makan Siang', 'value': 100},
-            {'label': 'Makan Malam', 'value': 70},
-          ],
-        },
-        {
-          'day': 'Senin',
-          'value': 220,
-          'percentage': 0.73,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 70},
-            {'label': 'Makan Siang', 'value': 90},
-            {'label': 'Makan Malam', 'value': 60},
-          ],
-        },
-        {
-          'day': 'Selasa',
-          'value': 180,
-          'percentage': 0.6,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 60},
-            {'label': 'Makan Siang', 'value': 70},
-            {'label': 'Makan Malam', 'value': 50},
-          ],
-        },
-        {
-          'day': 'Rabu',
-          'value': 240,
-          'percentage': 0.8,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 80},
-            {'label': 'Makan Siang', 'value': 95},
-            {'label': 'Makan Malam', 'value': 65},
-          ],
-        },
-        {
-          'day': 'Kam',
-          'value': 210,
-          'percentage': 0.7,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 70},
-            {'label': 'Makan Siang', 'value': 80},
-            {'label': 'Makan Malam', 'value': 60},
-          ],
-        },
-        {
-          'day': 'Jum',
-          'value': 170,
-          'percentage': 0.57,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 55},
-            {'label': 'Makan Siang', 'value': 65},
-            {'label': 'Makan Malam', 'value': 50},
-          ],
-        },
-        {
-          'day': 'Sab',
-          'value': 270,
-          'percentage': 0.9,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 90},
-            {'label': 'Makan Siang', 'value': 110},
-            {'label': 'Makan Malam', 'value': 70},
-          ],
-        },
-      ],
-    },
-    'Lemak': {
-      'total': 70,
-      'days': [
-        {
-          'day': 'Minggu',
-          'value': 55,
-          'percentage': 0.79,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 18},
-            {'label': 'Makan Siang', 'value': 22},
-            {'label': 'Makan Malam', 'value': 15},
-          ],
-        },
-        {
-          'day': 'Senin',
-          'value': 45,
-          'percentage': 0.64,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 15},
-            {'label': 'Makan Siang', 'value': 18},
-            {'label': 'Makan Malam', 'value': 12},
-          ],
-        },
-        {
-          'day': 'Selasa',
-          'value': 40,
-          'percentage': 0.57,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 12},
-            {'label': 'Makan Siang', 'value': 16},
-            {'label': 'Makan Malam', 'value': 12},
-          ],
-        },
-        {
-          'day': 'Rabu',
-          'value': 50,
-          'percentage': 0.71,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 16},
-            {'label': 'Makan Siang', 'value': 20},
-            {'label': 'Makan Malam', 'value': 14},
-          ],
-        },
-        {
-          'day': 'Kam',
-          'value': 48,
-          'percentage': 0.69,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 15},
-            {'label': 'Makan Siang', 'value': 19},
-            {'label': 'Makan Malam', 'value': 14},
-          ],
-        },
-        {
-          'day': 'Jum',
-          'value': 38,
-          'percentage': 0.54,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 12},
-            {'label': 'Makan Siang', 'value': 15},
-            {'label': 'Makan Malam', 'value': 11},
-          ],
-        },
-        {
-          'day': 'Sab',
-          'value': 60,
-          'percentage': 0.86,
-          'breakdown': [
-            {'label': 'Sarapan', 'value': 20},
-            {'label': 'Makan Siang', 'value': 24},
-            {'label': 'Makan Malam', 'value': 16},
-          ],
-        },
-      ],
-    },
-  };
-
-  // Data untuk line chart bulanan (30 hari dalam sebulan)
-  Map<String, Map<String, dynamic>> get monthlyNutritionData {
-    // Generate data untuk bulan yang dipilih
-    int daysInMonth = _getDaysInMonth(
-      selectedMonth.value,
-      int.parse(selectedYear.value),
-    );
-
-    return {
-      'Kalori': {
-        'total': 2000,
-        'days': List.generate(daysInMonth, (index) {
-          int day = index + 1;
-          // Generate nilai random untuk demo
-          double percentage = 0.5 + (day % 7) * 0.1 + ((day % 3) * 0.05);
-          int value = (2000 * percentage).round();
-          return {'day': day, 'value': value, 'percentage': percentage};
-        }),
-      },
-      'Protein': {
-        'total': 150,
-        'days': List.generate(daysInMonth, (index) {
-          int day = index + 1;
-          double percentage = 0.5 + (day % 7) * 0.08 + ((day % 4) * 0.06);
-          int value = (150 * percentage).round();
-          return {'day': day, 'value': value, 'percentage': percentage};
-        }),
-      },
-      'Karbohidrat': {
-        'total': 300,
-        'days': List.generate(daysInMonth, (index) {
-          int day = index + 1;
-          double percentage = 0.55 + (day % 6) * 0.09 + ((day % 5) * 0.04);
-          int value = (300 * percentage).round();
-          return {'day': day, 'value': value, 'percentage': percentage};
-        }),
-      },
-      'Lemak': {
-        'total': 70,
-        'days': List.generate(daysInMonth, (index) {
-          int day = index + 1;
-          double percentage = 0.6 + (day % 5) * 0.07 + ((day % 4) * 0.05);
-          int value = (70 * percentage).round();
-          return {'day': day, 'value': value, 'percentage': percentage};
-        }),
-      },
-    };
+  @override
+  void onInit() {
+    super.onInit();
+    _initializeController();
   }
 
-  // Get filtered data untuk line chart (5 hari per rentang)
+  Future<void> _initializeController() async {
+    // Initialize locale data for Indonesian
+    await initializeDateFormatting('id_ID', null);
+
+    // Set selectedMonth after locale is initialized
+    selectedMonth.value = DateFormat('MMMM', 'id_ID').format(DateTime.now());
+
+    // Then load statistics
+    loadStatistics();
+  }
+
+  Future<void> loadStatistics() async {
+    isLoading.value = true;
+    try {
+      await fetchUserData();
+      await fetchAllLogs();
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchUserData() async {
+    try {
+      final data = await UserServices.to.fetchUserProfile();
+      final userModel = UserModel.fromJson(data);
+      user.value = userModel;
+      // FIX: Explicitly convert int? to double?
+      _calculateBMI(userModel.height?.toDouble(), userModel.weight?.toDouble());
+    } catch (e) {
+      print('[Stats] Error fetching user: $e');
+    }
+  }
+
+  Future<void> fetchAllLogs() async {
+    try {
+      // Ambil banyak data sekaligus untuk di-filter lokal
+      final logs = await FoodLogService.to.getAllFoodLogs(limit: 100);
+      allLogs.assignAll(logs);
+      print('[Stats] Loaded ${logs.length} logs');
+    } catch (e) {
+      print('[Stats] Error fetching logs: $e');
+    }
+  }
+
+  void _calculateBMI(double? height, double? weight) {
+    if (height != null && weight != null && height > 0) {
+      double heightM = height / 100;
+      double bmi = weight / (heightM * heightM);
+      bmiValue.value = double.parse(bmi.toStringAsFixed(1));
+
+      if (bmi < 18.5) bmiStatus.value = 'Kurus';
+      else if (bmi < 25) bmiStatus.value = 'Normal';
+      else if (bmi < 30) bmiStatus.value = 'Gemuk';
+      else bmiStatus.value = 'Obesitas';
+    }
+  }
+
+  // ==========================================================================
+  // LOGIKA DATA CHART (GETTERS)
+  // ==========================================================================
+
+  // ---------------- DAILY DATA (Pie Chart) ----------------
+  Map<String, Map<String, dynamic>> get nutritionData {
+    // Filter logs untuk HARI INI
+    final now = DateTime.now();
+    final todayStr = DateFormat('yyyy-MM-dd').format(now);
+
+    final todayLogs = allLogs.where((log) {
+      // Pastikan format tanggal backend sesuai (biasanya ISO8601)
+      // Kita ambil bagian yyyy-MM-dd nya saja
+      return log.date.startsWith(todayStr);
+    }).toList();
+
+    // Template struktur data
+    Map<String, Map<String, dynamic>> data = {
+      'Kalori': {'total': 2000, 'consumed': 0, 'sections': []},
+      'Protein': {'total': 150, 'consumed': 0, 'sections': []},
+      'Karbohidrat': {'total': 300, 'consumed': 0, 'sections': []},
+      'Lemak': {'total': 70, 'consumed': 0, 'sections': []},
+    };
+
+    // Helper untuk inisialisasi sections
+    List<Map<String, dynamic>> initSections() => [
+      {'label': 'Sarapan', 'value': 0},
+      {'label': 'Makan Siang', 'value': 0},
+      {'label': 'Makan Malam', 'value': 0},
+    ];
+
+    // Set initial sections
+    data.forEach((key, value) {
+      value['sections'] = initSections();
+    });
+
+    // Iterasi Log Hari Ini
+    for (var log in todayLogs) {
+      // Tentukan index section berdasarkan mealType
+      int sectionIndex = -1;
+      if (log.mealType == 'Breakfast') sectionIndex = 0;
+      else if (log.mealType == 'Lunch') sectionIndex = 1;
+      else if (log.mealType == 'Dinner') sectionIndex = 2;
+
+      if (sectionIndex == -1) continue;
+
+      // Hitung nutrisi item di log ini
+      for (var item in log.items) {
+        int cal = item.calories; // Kalori sudah dihitung di model
+        double prot = _getNutrient(item, ['Protein']);
+        double carb = _getNutrient(item, ['Karbohidrat', 'Carbs']);
+        double fat = _getNutrient(item, ['Lemak', 'Fat']);
+
+        // Update Data Kalori
+        _updateDailyData(data['Kalori']!, sectionIndex, cal);
+        _updateDailyData(data['Protein']!, sectionIndex, (prot * item.servings).round());
+        _updateDailyData(data['Karbohidrat']!, sectionIndex, (carb * item.servings).round());
+        _updateDailyData(data['Lemak']!, sectionIndex, (fat * item.servings).round());
+      }
+    }
+
+    return data;
+  }
+
+  void _updateDailyData(Map<String, dynamic> nutrientData, int sectionIndex, int value) {
+    nutrientData['consumed'] = (nutrientData['consumed'] as int) + value;
+    List sections = nutrientData['sections'];
+    sections[sectionIndex]['value'] = (sections[sectionIndex]['value'] as int) + value;
+  }
+
+  // ---------------- WEEKLY DATA (Bar Chart) ----------------
+  Map<String, Map<String, dynamic>> get weeklyNutritionData {
+    // Tentukan rentang minggu ini (Minggu s/d Sabtu)
+    final now = DateTime.now();
+    // cari hari Minggu terakhir (atau hari ini jika Minggu)
+    final startOfWeek = now.subtract(Duration(days: now.weekday % 7));
+    // final endOfWeek = startOfWeek.add(const Duration(days: 6));
+
+    // Template Data
+    Map<String, Map<String, dynamic>> data = {
+      'Kalori': {'total': 2000, 'days': []},
+      'Protein': {'total': 150, 'days': []},
+      'Karbohidrat': {'total': 300, 'days': []},
+      'Lemak': {'total': 70, 'days': []},
+    };
+
+    // Generate struktur 7 hari
+    for (int i = 0; i < 7; i++) {
+      final currentDayDate = startOfWeek.add(Duration(days: i));
+      final dateStr = DateFormat('yyyy-MM-dd').format(currentDayDate);
+
+      // Filter log untuk tanggal ini
+      final dayLogs = allLogs.where((log) => log.date.startsWith(dateStr)).toList();
+
+      // Hitung total per nutrisi untuk hari ini
+      _calculateDayForWeekly(data['Kalori']!, 'Kalori', dayLogs, i);
+      _calculateDayForWeekly(data['Protein']!, 'Protein', dayLogs, i);
+      _calculateDayForWeekly(data['Karbohidrat']!, 'Karbohidrat', dayLogs, i);
+      _calculateDayForWeekly(data['Lemak']!, 'Lemak', dayLogs, i);
+    }
+
+    return data;
+  }
+
+  void _calculateDayForWeekly(
+      Map<String, dynamic> nutrientData,
+      String nutrientName,
+      List<FoodLogModel> logs,
+      int dayIndex
+      ) {
+    int totalValue = 0;
+    List<Map<String, dynamic>> breakdown = [
+      {'label': 'Sarapan', 'value': 0},
+      {'label': 'Makan Siang', 'value': 0},
+      {'label': 'Makan Malam', 'value': 0},
+    ];
+
+    for (var log in logs) {
+      int sectionIdx = -1;
+      if (log.mealType == 'Breakfast') sectionIdx = 0;
+      if (log.mealType == 'Lunch') sectionIdx = 1;
+      if (log.mealType == 'Dinner') sectionIdx = 2;
+
+      if (sectionIdx == -1) continue;
+
+      for (var item in log.items) {
+        double val = 0;
+        if (nutrientName == 'Kalori') {
+          val = item.calories.toDouble();
+        } else {
+          // Mapping nama nutrisi
+          List<String> keys = [];
+          if (nutrientName == 'Protein') keys = ['Protein'];
+          if (nutrientName == 'Karbohidrat') keys = ['Karbohidrat', 'Carbs'];
+          if (nutrientName == 'Lemak') keys = ['Lemak', 'Fat'];
+
+          val = _getNutrient(item, keys) * item.servings;
+        }
+
+        totalValue += val.round();
+        breakdown[sectionIdx]['value'] = (breakdown[sectionIdx]['value'] as int) + val.round();
+      }
+    }
+
+    // Hitung persentase terhadap target (Max bar height)
+    int target = nutrientData['total'];
+    double percentage = (totalValue / target).clamp(0.0, 1.0);
+
+    (nutrientData['days'] as List).add({
+      'day': weekDays[dayIndex],
+      'value': totalValue,
+      'percentage': percentage,
+      'breakdown': breakdown,
+    });
+  }
+
+  // ---------------- MONTHLY DATA (Line Chart) ----------------
+  Map<String, Map<String, dynamic>> get monthlyNutritionData {
+    int year = int.tryParse(selectedYear.value) ?? DateTime.now().year;
+    int monthIndex = months.indexOf(selectedMonth.value) + 1;
+    // Fix: if selectedMonth is empty (before init), use current month
+    if (monthIndex == 0) monthIndex = DateTime.now().month;
+
+    int daysInMonth = DateTime(year, monthIndex + 1, 0).day;
+
+    Map<String, Map<String, dynamic>> data = {
+      'Kalori': {'total': 2000, 'days': []},
+      'Protein': {'total': 150, 'days': []},
+      'Karbohidrat': {'total': 300, 'days': []},
+      'Lemak': {'total': 70, 'days': []},
+    };
+
+    // Generate data 1 sampai tgl terakhir
+    for (int d = 1; d <= daysInMonth; d++) {
+      String dateStr = '$year-${monthIndex.toString().padLeft(2, '0')}-${d.toString().padLeft(2, '0')}';
+
+      final dayLogs = allLogs.where((log) => log.date.startsWith(dateStr)).toList();
+
+      _calculateDayForMonthly(data['Kalori']!, 'Kalori', dayLogs, d);
+      _calculateDayForMonthly(data['Protein']!, 'Protein', dayLogs, d);
+      _calculateDayForMonthly(data['Karbohidrat']!, 'Karbohidrat', dayLogs, d);
+      _calculateDayForMonthly(data['Lemak']!, 'Lemak', dayLogs, d);
+    }
+
+    return data;
+  }
+
+  void _calculateDayForMonthly(
+      Map<String, dynamic> nutrientData,
+      String nutrientName,
+      List<FoodLogModel> logs,
+      int dayNumber
+      ) {
+    int totalValue = 0;
+
+    for (var log in logs) {
+      for (var item in log.items) {
+        double val = 0;
+        if (nutrientName == 'Kalori') {
+          val = item.calories.toDouble();
+        } else {
+          List<String> keys = [];
+          if (nutrientName == 'Protein') keys = ['Protein'];
+          if (nutrientName == 'Karbohidrat') keys = ['Karbohidrat', 'Carbs'];
+          if (nutrientName == 'Lemak') keys = ['Lemak', 'Fat'];
+          val = _getNutrient(item, keys) * item.servings;
+        }
+        totalValue += val.round();
+      }
+    }
+
+    int target = nutrientData['total'];
+    double percentage = (totalValue / target).clamp(0.0, 1.0);
+
+    (nutrientData['days'] as List).add({
+      'day': dayNumber,
+      'value': totalValue,
+      'percentage': percentage,
+    });
+  }
+
+  // --- Helpers ---
+
+  // Filtered data untuk paginasi chart bulanan (5 hari per page)
   Map<String, dynamic> get filteredMonthlyData {
     final fullData = monthlyNutritionData[selectedNutrient.value]!;
     final allDays = fullData['days'] as List;
 
     final startIndex = currentDateRangeIndex.value * 5;
     final endIndex = (startIndex + 5).clamp(0, allDays.length);
+
+    // Handle case jika range index melebihi data (misal ganti bulan yg harinya lebih sedikit)
+    if (startIndex >= allDays.length) {
+      return {
+        'total': fullData['total'],
+        'days': [],
+        'startDay': 0,
+        'endDay': 0,
+      };
+    }
 
     final filteredDays = allDays.sublist(startIndex, endIndex);
 
@@ -449,88 +354,65 @@ class StatisticsController extends GetxController {
     };
   }
 
-  // Get total jumlah rentang tanggal
   int get totalDateRanges {
     final fullData = monthlyNutritionData[selectedNutrient.value]!;
     final allDays = fullData['days'] as List;
     return (allDays.length / 5).ceil();
   }
 
-  // Navigasi ke rentang berikutnya
-  void nextDateRange() {
-    if (currentDateRangeIndex.value < totalDateRanges - 1) {
-      currentDateRangeIndex.value++;
+  double _getNutrient(FoodLogItemModel item, List<String> keys) {
+    if (item.food == null || item.food!.nutritionFacts.isEmpty) return 0.0;
+
+    try {
+      final fact = item.food!.nutritionFacts.firstWhere(
+            (f) => keys.any((k) => f.name.toLowerCase().contains(k.toLowerCase())),
+        orElse: () => NutritionFactModel(name: '', value: '0'),
+      );
+      String clean = fact.value.replaceAll(RegExp(r'[^0-9.,]'), '').replaceAll(',', '.');
+      return double.tryParse(clean) ?? 0.0;
+    } catch (_) {
+      return 0.0;
     }
   }
 
-  // Navigasi ke rentang sebelumnya
-  void previousDateRange() {
-    if (currentDateRangeIndex.value > 0) {
-      currentDateRangeIndex.value--;
-    }
-  }
-
-  int _getDaysInMonth(String month, int year) {
-    int monthIndex = months.indexOf(month) + 1;
-    return DateTime(year, monthIndex + 1, 0).day;
-  }
-
+  // UI Actions
   void changeTab(int index) {
     selectedTab.value = index;
-    selectedDayIndex.value = -1; // Reset selected day when changing tab
+    selectedDayIndex.value = -1;
   }
 
   void changeNutrient(String? nutrient) {
     if (nutrient != null) {
       selectedNutrient.value = nutrient;
-      selectedDayIndex.value = -1; // Reset selected day when changing nutrient
+      selectedDayIndex.value = -1;
     }
-  }
-
-  void setTouchedIndex(int index) {
-    touchedIndex.value = index;
   }
 
   void toggleDaySelection(int index) {
-    if (selectedDayIndex.value == index) {
-      selectedDayIndex.value = -1; // Unselect if already selected
-    } else {
-      selectedDayIndex.value = index; // Select the day
-    }
+    selectedDayIndex.value = (selectedDayIndex.value == index) ? -1 : index;
   }
 
   void changeMonth(String? month) {
     if (month != null) {
       selectedMonth.value = month;
-      currentDateRangeIndex.value = 0; // Reset ke rentang pertama
+      currentDateRangeIndex.value = 0;
     }
   }
 
   void changeYear(String? year) {
     if (year != null) {
       selectedYear.value = year;
-      currentDateRangeIndex.value = 0; // Reset ke rentang pertama
+      currentDateRangeIndex.value = 0;
     }
   }
 
-  // Get unit based on selected nutrient
-  String get currentUnit {
-    switch (selectedNutrient.value) {
-      case 'Kalori':
-        return 'kkal';
-      case 'Protein':
-        return 'g';
-      case 'Karbohidrat':
-        return 'g';
-      case 'Lemak':
-        return 'g';
-      default:
-        return '';
-    }
+  void nextDateRange() {
+    if (currentDateRangeIndex.value < totalDateRanges - 1) currentDateRangeIndex.value++;
   }
 
+  void previousDateRange() {
+    if (currentDateRangeIndex.value > 0) currentDateRangeIndex.value--;
+  }
 
-
-
-  void increment() => count.value++;
+  String get currentUnit => (selectedNutrient.value == 'Kalori') ? 'kkal' : 'g';
 }

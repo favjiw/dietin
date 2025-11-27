@@ -1,6 +1,7 @@
 import 'package:dietin/app/shared/constants/constant.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -12,44 +13,67 @@ class StatisticsView extends GetView<StatisticsController> {
   const StatisticsView({super.key});
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+    );
+
     return Scaffold(
       backgroundColor: AppColors.secondaryWhite,
       body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(height: 11.h),
-            Center(
-              child: Text('Statistik', style: AppTextStyles.headingAppBar),
+        child: RefreshIndicator(
+          onRefresh: () => controller.loadStatistics(),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                SizedBox(height: 11.h),
+                Center(
+                  child: Text('Statistik', style: AppTextStyles.headingAppBar),
+                ),
+                SizedBox(height: 20.h),
+                _buildTabBar(),
+                SizedBox(height: 20.h),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Asupan Nutrisi', style: AppTextStyles.label),
+                      _buildNutrientDropdown(),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20.h),
+
+                // Content Area (Chart)
+                // Menggunakan Obx agar rebuild saat tab/data berubah
+                Obx(() {
+                  if (controller.isLoading.value && controller.allLogs.isEmpty) {
+                    return Container(
+                      height: 300.h,
+                      child: const Center(child: CircularProgressIndicator()),
+                    );
+                  }
+
+                  switch (controller.selectedTab.value) {
+                    case 0:
+                      return _buildDailyChart();
+                    case 1:
+                      return _buildWeeklyChart();
+                    case 2:
+                      return _buildMonthlyChart();
+                    default:
+                      return SizedBox();
+                  }
+                }),
+
+                SizedBox(height: 30.h),
+              ],
             ),
-            SizedBox(height: 20.h),
-            _buildTabBar(),
-            SizedBox(height: 20.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Asupan Nutrisi', style: AppTextStyles.label),
-                  _buildNutrientDropdown(),
-                ],
-              ),
-            ),
-            SizedBox(height: 20.h),
-            Expanded(
-              child: Obx(() {
-                switch (controller.selectedTab.value) {
-                  case 0:
-                    return _buildDailyChart();
-                  case 1:
-                    return _buildWeeklyChart();
-                  case 2:
-                    return _buildMonthlyChart();
-                  default:
-                    return SizedBox();
-                }
-              }),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -57,7 +81,7 @@ class StatisticsView extends GetView<StatisticsController> {
 
   Widget _buildNutrientDropdown() {
     return Obx(
-      () => Container(
+          () => Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -70,7 +94,7 @@ class StatisticsView extends GetView<StatisticsController> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(
                   12.r,
-                ), // Radius menu dropdown
+                ),
               ),
             ),
           ),
@@ -93,6 +117,52 @@ class StatisticsView extends GetView<StatisticsController> {
     );
   }
 
+  Widget _buildTabBar() {
+    final tabs = ['Hari', 'Minggu', 'Bulan'];
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: Container(
+        height: 44.h,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        child: Obx(
+              () => Row(
+            children: List.generate(
+              tabs.length,
+                  (index) => Expanded(
+                child: GestureDetector(
+                  onTap: () => controller.changeTab(index),
+                  child: Container(
+                    margin: EdgeInsets.all(4.w),
+                    decoration: BoxDecoration(
+                      color: controller.selectedTab.value == index
+                          ? AppColors.primary
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(16.r),
+                    ),
+                    child: Center(
+                      child: Text(
+                        tabs[index],
+                        style: AppTextStyles.label.copyWith(
+                          color: controller.selectedTab.value == index
+                              ? Colors.white
+                              : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildDailyChart() {
     return Obx(() {
       final data = controller.nutritionData[controller.selectedNutrient.value]!;
@@ -100,212 +170,100 @@ class StatisticsView extends GetView<StatisticsController> {
       final total = data['total'];
       final consumed = data['consumed'];
 
-      return SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: Column(
-          children: [
-            SizedBox(height: 20.h),
-            SizedBox(
-              height: 250.h,
-              child: Center(
-                child: _buildCircularProgress(
-                  sections: sections,
-                  total: total,
-                  consumed: consumed,
-                ),
+      return Column(
+        children: [
+          SizedBox(height: 20.h),
+          SizedBox(
+            height: 250.h,
+            child: Center(
+              child: _buildCircularProgress(
+                sections: sections,
+                total: total,
+                consumed: consumed,
               ),
             ),
-            SizedBox(height: 30.h),
-            Row(
+          ),
+          SizedBox(height: 30.h),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Detail', style: AppTextStyles.labelBold),
-                Obx(
-                  () => Text(
-                    '${controller.selectedNutrient.value} (${controller.currentUnit})',
-                    style: AppTextStyles.label.copyWith(
-                      color: AppColors.lightGrey,
-                    ),
+                Text(
+                  '${controller.selectedNutrient.value} (${controller.currentUnit})',
+                  style: AppTextStyles.label.copyWith(
+                    color: AppColors.lightGrey,
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 12.h),
-            Container(
-              width: 1.sw,
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
-              decoration: BoxDecoration(
-                color: AppColors.mainWhite,
-                borderRadius: BorderRadius.circular(10.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 4.r,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              //main row
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  //left row
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 20.r,
-                        backgroundColor: Colors.transparent,
-                        child: SvgPicture.asset(
-                          'assets/images/sunrise_ic.svg',
-                          width: 24.w,
-                          height: 24.h,
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Text('Sarapan', style: AppTextStyles.bodySmallSemiBold),
-                    ],
-                  ),
-                  //right row
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${sections[0]['value']}',
-                        style: AppTextStyles.labelBold.copyWith(
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+          ),
+          SizedBox(height: 12.h),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            child: Column(
+              children: [
+                _buildMealCard('assets/images/sunrise_ic.svg', 'Sarapan', sections[0]['value']),
+                SizedBox(height: 12.h),
+                _buildMealCard('assets/images/sun_ic.svg', 'Makan Siang', sections[1]['value']),
+                SizedBox(height: 12.h),
+                _buildMealCard('assets/images/sunset_ic.svg', 'Makan Malam', sections[2]['value']),
+              ],
             ),
-            SizedBox(height: 12.h),
-            Container(
-              width: 1.sw,
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
-              decoration: BoxDecoration(
-                color: AppColors.mainWhite,
-                borderRadius: BorderRadius.circular(10.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 4.r,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              //main row
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  //left row
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 20.r,
-                        backgroundColor: Colors.transparent,
-                        child: SvgPicture.asset(
-                          'assets/images/sun_ic.svg',
-                          width: 24.w,
-                          height: 24.h,
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Text(
-                        'Makan Siang',
-                        style: AppTextStyles.bodySmallSemiBold,
-                      ),
-                    ],
-                  ),
-                  //right row
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${sections[1]['value']}',
-                        style: AppTextStyles.labelBold.copyWith(
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 12.h),
-            Container(
-              width: 1.sw,
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
-              decoration: BoxDecoration(
-                color: AppColors.mainWhite,
-                borderRadius: BorderRadius.circular(10.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 4.r,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              //main row
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  //left row
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 20.r,
-                        backgroundColor: Colors.transparent,
-                        child: SvgPicture.asset(
-                          'assets/images/sunset_ic.svg',
-                          width: 24.w,
-                          height: 24.h,
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Text(
-                        'Makan Malam',
-                        style: AppTextStyles.bodySmallSemiBold,
-                      ),
-                    ],
-                  ),
-                  //right row
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${sections[2]['value']}',
-                        style: AppTextStyles.labelBold.copyWith(
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 30.h),
-          ],
-        ),
+          )
+        ],
       );
     });
+  }
+
+  Widget _buildMealCard(String iconPath, String label, int value) {
+    return Container(
+      width: 1.sw,
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: AppColors.mainWhite,
+        borderRadius: BorderRadius.circular(10.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 4.r,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 20.r,
+                backgroundColor: Colors.transparent,
+                child: SvgPicture.asset(iconPath, width: 24.w, height: 24.h),
+              ),
+              SizedBox(width: 12.w),
+              Text(label, style: AppTextStyles.bodySmallSemiBold),
+            ],
+          ),
+          Text(
+            '$value',
+            style: AppTextStyles.labelBold.copyWith(color: AppColors.primary),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildWeeklyChart() {
     return Obx(() {
       final data =
-          controller.weeklyNutritionData[controller.selectedNutrient.value]!;
+      controller.weeklyNutritionData[controller.selectedNutrient.value]!;
       final days = data['days'] as List;
 
-      return SingleChildScrollView(
+      return Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         child: Column(
           children: [
@@ -340,14 +298,12 @@ class StatisticsView extends GetView<StatisticsController> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            // Progress Bar Stack
                             Expanded(
                               child: Align(
                                 alignment: Alignment.bottomCenter,
                                 child: Obx(() {
                                   final isSelected =
-                                      controller.selectedDayIndex.value ==
-                                      index;
+                                      controller.selectedDayIndex.value == index;
                                   return Container(
                                     width: double.infinity,
                                     height: 150.h,
@@ -359,9 +315,9 @@ class StatisticsView extends GetView<StatisticsController> {
                                       ),
                                       border: isSelected
                                           ? Border.all(
-                                              color: AppColors.primary,
-                                              width: 2.w,
-                                            )
+                                        color: AppColors.primary,
+                                        width: 2.w,
+                                      )
                                           : null,
                                     ),
                                     child: Align(
@@ -374,7 +330,7 @@ class StatisticsView extends GetView<StatisticsController> {
                                         ),
                                         decoration: BoxDecoration(
                                           color:
-                                              AppColors.calorieBackgroundActive,
+                                          AppColors.calorieBackgroundActive,
                                           borderRadius: BorderRadius.circular(
                                             100.r,
                                           ),
@@ -386,7 +342,6 @@ class StatisticsView extends GetView<StatisticsController> {
                               ),
                             ),
                             SizedBox(height: 8.h),
-                            // Day label
                             Obx(() {
                               final isSelected =
                                   controller.selectedDayIndex.value == index;
@@ -438,24 +393,11 @@ class StatisticsView extends GetView<StatisticsController> {
                       ],
                     ),
                     SizedBox(height: 12.h),
-                    _buildMealCard(
-                      'assets/images/sunrise_ic.svg',
-                      breakdown[0]['label'],
-                      breakdown[0]['value'],
-                    ),
+                    _buildMealCard('assets/images/sunrise_ic.svg', breakdown[0]['label'], breakdown[0]['value']),
                     SizedBox(height: 12.h),
-                    _buildMealCard(
-                      'assets/images/sun_ic.svg',
-                      breakdown[1]['label'],
-                      breakdown[1]['value'],
-                    ),
+                    _buildMealCard('assets/images/sun_ic.svg', breakdown[1]['label'], breakdown[1]['value']),
                     SizedBox(height: 12.h),
-                    _buildMealCard(
-                      'assets/images/sunset_ic.svg',
-                      breakdown[2]['label'],
-                      breakdown[2]['value'],
-                    ),
-                    SizedBox(height: 30.h),
+                    _buildMealCard('assets/images/sunset_ic.svg', breakdown[2]['label'], breakdown[2]['value']),
                   ],
                 );
               }
@@ -518,9 +460,9 @@ class StatisticsView extends GetView<StatisticsController> {
                                         controller.weekDays[index],
                                         style: AppTextStyles.bodySmallSemiBold
                                             .copyWith(
-                                              color: AppColors.primary,
-                                              fontSize: 12.sp,
-                                            ),
+                                          color: AppColors.primary,
+                                          fontSize: 12.sp,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -553,7 +495,6 @@ class StatisticsView extends GetView<StatisticsController> {
                       ),
                     );
                   }),
-                  SizedBox(height: 30.h),
                 ],
               );
             }),
@@ -561,46 +502,6 @@ class StatisticsView extends GetView<StatisticsController> {
         ),
       );
     });
-  }
-
-  Widget _buildMealCard(String iconPath, String label, int value) {
-    return Container(
-      width: 1.sw,
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        color: AppColors.mainWhite,
-        borderRadius: BorderRadius.circular(10.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 4.r,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                radius: 20.r,
-                backgroundColor: Colors.transparent,
-                child: SvgPicture.asset(iconPath, width: 24.w, height: 24.h),
-              ),
-              SizedBox(width: 12.w),
-              Text(label, style: AppTextStyles.bodySmallSemiBold),
-            ],
-          ),
-          Text(
-            '$value',
-            style: AppTextStyles.labelBold.copyWith(color: AppColors.primary),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildMonthlyChart() {
@@ -611,7 +512,7 @@ class StatisticsView extends GetView<StatisticsController> {
       final startDay = filteredData['startDay'];
       final endDay = filteredData['endDay'];
 
-      return SingleChildScrollView(
+      return Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -726,15 +627,15 @@ class StatisticsView extends GetView<StatisticsController> {
                   ),
                   IconButton(
                     onPressed:
-                        controller.currentDateRangeIndex.value <
-                            controller.totalDateRanges - 1
+                    controller.currentDateRangeIndex.value <
+                        controller.totalDateRanges - 1
                         ? controller.nextDateRange
                         : null,
                     icon: Icon(
                       Icons.chevron_right,
                       color:
-                          controller.currentDateRangeIndex.value <
-                              controller.totalDateRanges - 1
+                      controller.currentDateRangeIndex.value <
+                          controller.totalDateRanges - 1
                           ? AppColors.primary
                           : Colors.grey.shade400,
                     ),
@@ -808,14 +709,14 @@ class StatisticsView extends GetView<StatisticsController> {
                   }
 
                   final average =
-                      (values.fold<int>(0, (sum, val) => sum + val) /
-                              values.length)
-                          .round();
+                  (values.fold<int>(0, (sum, val) => sum + val) /
+                      values.length)
+                      .round();
                   final highest = values.reduce((a, b) => a > b ? a : b);
                   final lowest = values.reduce((a, b) => a < b ? a : b);
                   final totalMonth = values.fold<int>(
                     0,
-                    (sum, val) => sum + val,
+                        (sum, val) => sum + val,
                   );
 
                   return Column(
@@ -835,7 +736,6 @@ class StatisticsView extends GetView<StatisticsController> {
                 },
               ),
             ),
-            SizedBox(height: 30.h),
           ],
         ),
       );
@@ -852,52 +752,6 @@ class StatisticsView extends GetView<StatisticsController> {
           style: AppTextStyles.labelBold.copyWith(color: AppColors.primary),
         ),
       ],
-    );
-  }
-
-  Widget _buildTabBar() {
-    final tabs = ['Hari', 'Minggu', 'Bulan'];
-
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
-      child: Container(
-        height: 44.h,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        child: Obx(
-          () => Row(
-            children: List.generate(
-              tabs.length,
-              (index) => Expanded(
-                child: GestureDetector(
-                  onTap: () => controller.changeTab(index),
-                  child: Container(
-                    margin: EdgeInsets.all(4.w),
-                    decoration: BoxDecoration(
-                      color: controller.selectedTab.value == index
-                          ? AppColors.primary
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(16.r),
-                    ),
-                    child: Center(
-                      child: Text(
-                        tabs[index],
-                        style: AppTextStyles.label.copyWith(
-                          color: controller.selectedTab.value == index
-                              ? Colors.white
-                              : Colors.grey,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -1073,9 +927,9 @@ class LineChartPainter extends CustomPainter {
 
       final x =
           leftPadding +
-          (days.length > 1
-              ? (chartWidth / (days.length - 1)) * i
-              : chartWidth / 2);
+              (days.length > 1
+                  ? (chartWidth / (days.length - 1)) * i
+                  : chartWidth / 2);
       final y = topPadding + chartHeight - (chartHeight * percentage);
 
       points.add(Offset(x, y));

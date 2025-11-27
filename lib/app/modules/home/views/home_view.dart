@@ -1,3 +1,4 @@
+import 'package:dietin/app/data/FoodLogModel.dart';
 import 'package:dietin/app/shared/constants/constant.dart';
 import 'package:dietin/app/shared/widgets/horizontal_progress_bar.dart';
 import 'package:dietin/app/shared/widgets/nutrient_card.dart';
@@ -23,431 +24,380 @@ class HomeView extends GetView<HomeController> {
     return Scaffold(
       backgroundColor: AppColors.secondaryWhite,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 11.h),
+        child: RefreshIndicator(
+          onRefresh: () => controller.loadDashboardData(),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 11.h),
 
-                // header user + notif, pakai data dari HomeController
-                Obx(() {
-                  final isLoading = controller.isLoading.value;
-                  final user = controller.user.value;
-                  final error = controller.errorMessage.value;
+                  // --- HEADER USER ---
+                  Obx(() {
+                    final isLoading = controller.isLoading.value;
+                    final user = controller.user.value;
+                    final error = controller.errorMessage.value;
 
-                  String displayName = 'Pengguna';
-                  if (isLoading) {
-                    displayName = 'Memuat...';
-                  } else if (error.isNotEmpty) {
-                    displayName = 'Gagal memuat';
-                  } else if (user != null && user.name.isNotEmpty) {
-                    displayName = user.name;
-                  }
+                    String displayName = 'Pengguna';
+                    if (!isLoading && error.isEmpty && user != null) {
+                      displayName = user.name;
+                    }
 
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          CircleAvatar(
-                            radius: 30.r,
-                            backgroundImage: const AssetImage(
-                              'assets/images/male_ic.png',
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: 30.r,
+                              backgroundImage: const AssetImage(
+                                'assets/images/male_ic.png',
+                              ),
+                              backgroundColor: AppColors.primary,
                             ),
-                            backgroundColor: AppColors.primary,
-                          ),
-                          SizedBox(width: 10.h),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Selamat datang! ',
-                                    style: AppTextStyles.bodySmall,
-                                  ),
-                                  Image.asset(
-                                    'assets/images/hand_ic.png',
-                                    width: 14.w,
-                                    height: 14.h,
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 4.h),
-                              Text(
-                                displayName,
-                                style: AppTextStyles.bodySmallSemiBold,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      CircleAvatar(
-                        radius: 25.r,
-                        backgroundColor: AppColors.mainWhite,
-                        child: IconButton(
-                          onPressed: () {
-                            Get.toNamed('/notification');
-                          },
-                          icon: SvgPicture.asset(
-                            'assets/images/notif_ic.svg',
-                            width: 25.w,
-                            height: 25.h,
+                            SizedBox(width: 10.h),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Selamat datang! ',
+                                      style: AppTextStyles.bodySmall,
+                                    ),
+                                    Image.asset(
+                                      'assets/images/hand_ic.png',
+                                      width: 14.w,
+                                      height: 14.h,
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 4.h),
+                                Text(
+                                  displayName,
+                                  style: AppTextStyles.bodySmallSemiBold,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        CircleAvatar(
+                          radius: 25.r,
+                          backgroundColor: AppColors.mainWhite,
+                          child: IconButton(
+                            onPressed: () {
+                              Get.toNamed('/notification');
+                            },
+                            icon: SvgPicture.asset(
+                              'assets/images/notif_ic.svg',
+                              width: 25.w,
+                              height: 25.h,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  );
-                }),
+                      ],
+                    );
+                  }),
 
-                SizedBox(height: 24.h),
-                Text('Asupan Harian', style: AppTextStyles.labelBold),
-                SizedBox(height: 16.h),
-                CaloriePill(
-                  title: 'Kalori',
-                  current: 1890,
-                  target: 2000,
-                  bg: AppColors.calorieBackgroundActive.withValues(alpha: 0.5),
-                  fill: AppColors.calorieBackgroundActive,
-                ),
-                SizedBox(height: 8.h),
-                Row(
-                  children: [
-                    Expanded(
-                      child: NutrientCard(
-                        title: 'Karbo',
-                        unit: 'g',
-                        current: 120,
-                        target: 150,
-                        bg: const Color(0xFFE2A16F).withValues(alpha: 0.5),
-                        fill: const Color(0xFFE2A16F),
-                        asset: 'assets/images/carb_ic.png',
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    Expanded(
-                      child: NutrientCard(
-                        title: 'Protein',
-                        unit: 'g',
-                        current: 24,
-                        target: 100,
-                        bg: const Color(0xFFDA6C6C).withValues(alpha: 0.5),
-                        fill: const Color(0xFFDA6C6C),
-                        asset: 'assets/images/protein_ic.png',
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    Expanded(
-                      child: NutrientCard(
-                        title: 'Lemak',
-                        unit: 'g',
-                        current: 29,
-                        target: 70,
-                        bg: const Color(0xFF9BB4C0).withValues(alpha: 0.5),
-                        fill: const Color(0xFF9BB4C0),
-                        asset: 'assets/images/fat_ic.png',
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 24.h),
-                Text('Tambah Makanan', style: AppTextStyles.labelBold),
-                SizedBox(height: 16.h),
-                //meal container if food exist
-                Stack(
-                  children: [
-                    //open container if food added
-                    Container(
-                      width: 1.sw,
-                      padding: EdgeInsets.symmetric(horizontal: 12.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.mainWhite,
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 95.h),
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: 5,
-                            itemBuilder: (context, index) {
-                              return Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Nasi  Putih',
-                                            style:
-                                            AppTextStyles.bodySmallSemiBold,
-                                          ),
-                                          SizedBox(height: 4.h),
-                                          Text(
-                                            '100 gr',
-                                            style: AppTextStyles.bodyLight,
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            '90 kkal',
-                                            style: AppTextStyles.bodyLight,
-                                          ),
-                                          SizedBox(width: 4.w),
-                                          InkWell(
-                                            onTap: () {},
-                                            child: Icon(
-                                              Icons
-                                                  .keyboard_arrow_right_rounded,
-                                              color: AppColors.lightGrey,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 12.h),
-                                ],
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    //main container
-                    Container(
-                      width: 1.sw,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10.w,
-                        vertical: 12.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.mainWhite,
-                        borderRadius: BorderRadius.circular(10.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 4.r,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              CircleAvatar(
-                                radius: 20.r,
-                                backgroundColor: Colors.transparent,
-                                child: SvgPicture.asset(
-                                  'assets/images/sunrise_ic.svg',
-                                  width: 24.w,
-                                  height: 24.h,
-                                ),
-                              ),
-                              SizedBox(width: 12.w),
-                              Text(
-                                'Sarapan',
-                                style: AppTextStyles.bodySmallSemiBold,
-                              ),
-                            ],
-                          ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    '355',
-                                    style: AppTextStyles.bodySmallSemiBold,
-                                  ),
-                                  Text(
-                                    'kalori',
-                                    style: AppTextStyles.bodySmall,
-                                  ),
-                                ],
-                              ),
-                              SizedBox(width: 12.w),
-                              CircleAvatar(
-                                radius: 25.r,
-                                backgroundColor: AppColors.primary,
-                                child: IconButton(
-                                  onPressed: () {
-                                    Get.toNamed('/search-food');
-                                  },
-                                  icon: Icon(
-                                    Icons.add_rounded,
-                                    color: AppColors.mainWhite,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 9.h),
-                Container(
-                  width: 1.sw,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.w,
-                    vertical: 12.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.mainWhite,
-                    borderRadius: BorderRadius.circular(10.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 4.r,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          CircleAvatar(
-                            radius: 20.r,
-                            backgroundColor: Colors.transparent,
-                            child: SvgPicture.asset(
-                              'assets/images/sun_ic.svg',
-                              width: 24.w,
-                              height: 24.h,
-                            ),
-                          ),
-                          SizedBox(width: 12.w),
-                          Text(
-                            'Makan Siang',
-                            style: AppTextStyles.bodySmallSemiBold,
-                          ),
-                        ],
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text('', style: AppTextStyles.bodySmallSemiBold),
-                              Text('', style: AppTextStyles.bodySmall),
-                            ],
-                          ),
-                          SizedBox(width: 12.w),
-                          CircleAvatar(
-                            radius: 25.r,
-                            backgroundColor: AppColors.primary,
-                            child: IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.add_rounded,
-                                color: AppColors.mainWhite,
+                  SizedBox(height: 24.h),
+                  Text('Asupan Harian', style: AppTextStyles.labelBold),
+                  SizedBox(height: 16.h),
+
+                  // --- PROGRESS BAR NUTRISI ---
+                  Obx(() {
+                    return Column(
+                      children: [
+                        CaloriePill(
+                          title: 'Kalori',
+                          current: controller.totalCaloriesConsumed.value,
+                          target: controller.targetCalories,
+                          bg: AppColors.calorieBackgroundActive.withValues(alpha: 0.5),
+                          fill: AppColors.calorieBackgroundActive,
+                        ),
+                        SizedBox(height: 8.h),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: NutrientCard(
+                                title: 'Karbo',
+                                unit: 'g',
+                                current: controller.totalCarbsConsumed.value,
+                                target: controller.targetCarbs,
+                                bg: const Color(0xFFE2A16F).withValues(alpha: 0.5),
+                                fill: const Color(0xFFE2A16F),
+                                asset: 'assets/images/carb_ic.png',
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 9.h),
-                Container(
-                  width: 1.sw,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.w,
-                    vertical: 12.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.mainWhite,
-                    borderRadius: BorderRadius.circular(10.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 4.r,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          CircleAvatar(
-                            radius: 20.r,
-                            backgroundColor: Colors.transparent,
-                            child: SvgPicture.asset(
-                              'assets/images/sunset_ic.svg',
-                              width: 24.w,
-                              height: 24.h,
-                            ),
-                          ),
-                          SizedBox(width: 12.w),
-                          Text(
-                            'Makan Malam',
-                            style: AppTextStyles.bodySmallSemiBold,
-                          ),
-                        ],
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text('', style: AppTextStyles.bodySmallSemiBold),
-                              Text('', style: AppTextStyles.bodySmall),
-                            ],
-                          ),
-                          SizedBox(width: 12.w),
-                          CircleAvatar(
-                            radius: 25.r,
-                            backgroundColor: AppColors.primary,
-                            child: IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.add_rounded,
-                                color: AppColors.mainWhite,
+                            SizedBox(width: 8.w),
+                            Expanded(
+                              child: NutrientCard(
+                                title: 'Protein',
+                                unit: 'g',
+                                current: controller.totalProteinConsumed.value,
+                                target: controller.targetProtein,
+                                bg: const Color(0xFFDA6C6C).withValues(alpha: 0.5),
+                                fill: const Color(0xFFDA6C6C),
+                                asset: 'assets/images/protein_ic.png',
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                            SizedBox(width: 8.w),
+                            Expanded(
+                              child: NutrientCard(
+                                title: 'Lemak',
+                                unit: 'g',
+                                current: controller.totalFatConsumed.value,
+                                target: controller.targetFat,
+                                bg: const Color(0xFF9BB4C0).withValues(alpha: 0.5),
+                                fill: const Color(0xFF9BB4C0),
+                                asset: 'assets/images/fat_ic.png',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  }),
+
+                  SizedBox(height: 24.h),
+                  Text('Jurnal Makanan', style: AppTextStyles.labelBold),
+                  SizedBox(height: 16.h),
+
+                  // --- MEAL SECTIONS ---
+                  Obx(() => _buildMealSection(
+                    title: 'Sarapan',
+                    iconAsset: 'assets/images/sunrise_ic.svg',
+                    log: controller.breakfastLog.value,
+                    mealTypeForNav: 'Breakfast',
+                  )),
+                  SizedBox(height: 9.h),
+
+                  Obx(() => _buildMealSection(
+                    title: 'Makan Siang',
+                    iconAsset: 'assets/images/sun_ic.svg',
+                    log: controller.lunchLog.value,
+                    mealTypeForNav: 'Lunch',
+                  )),
+                  SizedBox(height: 9.h),
+
+                  Obx(() => _buildMealSection(
+                    title: 'Makan Malam',
+                    iconAsset: 'assets/images/sunset_ic.svg',
+                    log: controller.dinnerLog.value,
+                    mealTypeForNav: 'Dinner',
+                  )),
+
+                  SizedBox(height: 40.h),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildMealSection({
+    required String title,
+    required String iconAsset,
+    required FoodLogModel? log,
+    required String mealTypeForNav,
+  }) {
+    final bool hasData = log != null && log.items.isNotEmpty;
+
+    if (hasData) {
+      // 1. LOGIKA GROUPING ITEM
+      // Kita gabungkan item dengan foodId yang sama agar tampil sebagai satu baris "X Porsi"
+      final Map<int, FoodLogItemModel> groupedItems = {};
+
+      for (var item in log!.items) {
+        final foodId = item.foodId; // ID unik makanan
+
+        if (groupedItems.containsKey(foodId)) {
+          // Jika sudah ada, update (akumulasi) servings dan calories
+          final existing = groupedItems[foodId]!;
+          groupedItems[foodId] = FoodLogItemModel(
+            id: existing.id, // ID dummy, tidak terlalu penting untuk tampilan
+            foodId: foodId,
+            servings: existing.servings + item.servings, // Jumlahkan Porsi
+            calories: existing.calories + item.calories, // Jumlahkan Kalori
+            food: existing.food, // Data makanan tetap sama
+          );
+        } else {
+          // Jika belum ada, tambahkan sebagai entry baru
+          groupedItems[foodId] = item;
+        }
+      }
+
+      // Konversi map kembali ke list untuk ListView
+      final displayList = groupedItems.values.toList();
+
+      // 2. Total Kalori Header (Tetap hitung dari semua item mentah agar akurat)
+      final sectionCalories = log.items.fold(0, (sum, item) => sum + item.calories);
+
+      // OPEN CONTAINER
+      return Container(
+        width: 1.sw,
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: AppColors.mainWhite,
+          borderRadius: BorderRadius.circular(10.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 4.r,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20.r,
+                      backgroundColor: Colors.transparent,
+                      child: SvgPicture.asset(iconAsset, width: 24.w, height: 24.h),
+                    ),
+                    SizedBox(width: 12.w),
+                    Text(title, style: AppTextStyles.bodySmallSemiBold),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        // Menampilkan total akumulasi kalori di header
+                        Text('$sectionCalories', style: AppTextStyles.bodySmallSemiBold),
+                        Text('kalori', style: AppTextStyles.bodySmall),
+                      ],
+                    ),
+                    SizedBox(width: 12.w),
+                    CircleAvatar(
+                      radius: 25.r,
+                      backgroundColor: AppColors.primary,
+                      child: IconButton(
+                        onPressed: () {
+                          Get.toNamed('/search-food', arguments: {'mealType': mealTypeForNav});
+                        },
+                        icon: Icon(Icons.add_rounded, color: AppColors.mainWhite, size: 20.sp),
+                        padding: EdgeInsets.zero,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.h),
+              child: Divider(color: AppColors.lightGrey.withValues(alpha: 0.3), thickness: 1),
+            ),
+
+            // Render list menggunakan DATA YANG SUDAH DI-GROUPING (displayList)
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: displayList.length,
+              padding: EdgeInsets.zero,
+              itemBuilder: (context, index) {
+                final item = displayList[index];
+                final foodName = item.food?.name ?? 'Makanan';
+
+                // Format porsi agar rapi (misal 3.0 -> 3)
+                String servingText = item.servings % 1 == 0
+                    ? item.servings.toInt().toString()
+                    : item.servings.toString();
+
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 12.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(foodName, style: AppTextStyles.bodySmallSemiBold),
+                            SizedBox(height: 4.h),
+                            // Menampilkan total porsi yang sudah digabung
+                            Text('$servingText Porsi', style: AppTextStyles.bodyLight),
+                          ],
+                        ),
+                      ),
+                      // Menampilkan total kalori item ini (setelah dikali porsi)
+                      Text('${item.calories} kkal', style: AppTextStyles.bodyLight),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    } else {
+      // CLOSED CONTAINER (Tampilan Kosong)
+      return Container(
+        width: 1.sw,
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: AppColors.mainWhite,
+          borderRadius: BorderRadius.circular(10.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 4.r,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 20.r,
+                  backgroundColor: Colors.transparent,
+                  child: SvgPicture.asset(iconAsset, width: 24.w, height: 24.h),
+                ),
+                SizedBox(width: 12.w),
+                Text(title, style: AppTextStyles.bodySmallSemiBold),
+              ],
+            ),
+            Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('-', style: AppTextStyles.bodySmallSemiBold),
+                    Text('kalori', style: AppTextStyles.bodySmall),
+                  ],
+                ),
+                SizedBox(width: 12.w),
+                CircleAvatar(
+                  radius: 25.r,
+                  backgroundColor: AppColors.primary,
+                  child: IconButton(
+                    onPressed: () {
+                      Get.toNamed('/search-food', arguments: {'mealType': mealTypeForNav});
+                    },
+                    icon: Icon(Icons.add_rounded, color: AppColors.mainWhite),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
