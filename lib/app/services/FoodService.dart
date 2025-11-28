@@ -185,4 +185,56 @@ class FoodService extends GetConnect {
       rethrow;
     }
   }
+
+  // 3. GET /food/upc/:upc
+  Future<dynamic> searchFoodByUpc(String upc) async {
+    try {
+      final response = await get('${Endpoint.foodUpc}/$upc');
+
+      // Error handling
+      var body = response.body;
+      if (body is String) {
+        try { body = jsonDecode(body); } catch (_) {}
+      }
+
+      if (response.status.hasError) {
+        String message = 'Gagal mencari produk';
+        if (body is Map && body['message'] != null) {
+          message = body['message'];
+        }
+        throw Exception(message);
+      }
+
+      if (body is Map && body['response'] != null && body['response']['payload'] != null) {
+        return body['response']['payload'];
+      }
+      return null;
+    } catch (e) {
+      print('[FoodService] Error searchFoodByUpc: $e');
+      rethrow;
+    }
+  }
+
+  // 4. POST /food/upc/:upc/log
+  Future<bool> logFoodByUpc(String upc, Map<String, dynamic> logData) async {
+    try {
+      final response = await post('${Endpoint.foodUpc}/$upc/log', logData);
+
+      // Error handling
+      var body = response.body;
+      if (body is String) {
+        try { body = jsonDecode(body); } catch (_) {}
+      }
+
+      if (response.status.hasError) {
+        String msg = 'Gagal menyimpan log UPC';
+        if (body is Map && body['message'] != null) msg = body['message'];
+        throw Exception(msg);
+      }
+      return true;
+    } catch (e) {
+      print('[FoodService] Error logFoodByUpc: $e');
+      rethrow;
+    }
+  }
 }

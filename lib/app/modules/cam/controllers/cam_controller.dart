@@ -11,45 +11,45 @@ import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class CamController extends GetxController {
-  // State Mode: True = Photo (AI), False = Scan (Barcode)
+  
   var isPhotoMode = true.obs;
 
-  // State Loading untuk proses upload API
+  
   var isLoading = false.obs;
 
-  // State untuk Dropdown Pilihan Waktu Makan
+  
   var selectedMealType = 'Breakfast'.obs;
 
-  // --- KAMERA NATIVE (Untuk Foto AI) ---
+  
   CameraController? cameraController;
   List<CameraDescription>? _cameras;
   var isCameraInitialized = false.obs;
 
-  // --- SCANNER (Untuk Barcode) ---
+  
   late MobileScannerController scannerController;
 
   @override
   void onInit() {
     super.onInit();
-    // Inisialisasi controller scanner
+    
     scannerController = MobileScannerController(
       detectionSpeed: DetectionSpeed.noDuplicates,
       autoStart: false,
     );
 
-    // Default mulai di mode Foto
+    
     _initializeCamera();
   }
 
   @override
   void onClose() {
-    // Pastikan resource dilepas dengan aman saat controller mati
+    
     _disposeCamera();
     scannerController.dispose();
     super.onClose();
   }
 
-  // --- HELPER: Matikan Kamera dengan Aman ---
+  
   Future<void> _disposeCamera() async {
     if (cameraController != null) {
       try {
@@ -69,10 +69,10 @@ class CamController extends GetxController {
     }
   }
 
-  // --- LOGIKA GANTI MODE (Lifecycle Management) ---
+  
   Future<void> toggleMode() async {
     if (isPhotoMode.value) {
-      // BERPINDAH KE SCAN MODE (Barcode)
+      
       await _disposeCamera();
       isPhotoMode.value = false;
 
@@ -84,7 +84,7 @@ class CamController extends GetxController {
       }
 
     } else {
-      // BERPINDAH KE PHOTO MODE (AI)
+      
       await scannerController.stop();
       isPhotoMode.value = true;
       await _initializeCamera();
@@ -119,7 +119,7 @@ class CamController extends GetxController {
   }
 
 
-  // --- FITUR 1: AMBIL FOTO & SCAN AI ---
+  
   Future<void> takePicture() async {
     if (cameraController == null || !cameraController!.value.isInitialized || isLoading.value) {
       return;
@@ -140,7 +140,7 @@ class CamController extends GetxController {
       isLoading.value = false;
 
       if (scanResult != null) {
-        _showScanResultSheet(scanResult, imageFile);
+        _showScanResultSheet(scanResult, imageFile: imageFile);
       }
 
     } catch (e) {
@@ -155,27 +155,53 @@ class CamController extends GetxController {
     }
   }
 
-  // --- FITUR 2: SCAN BARCODE ---
-  void onBarcodeDetect(BarcodeCapture capture) {
+  
+  void onBarcodeDetect(BarcodeCapture capture) async {
     final List<Barcode> barcodes = capture.barcodes;
     for (final barcode in barcodes) {
       if (barcode.rawValue != null) {
+        if (isLoading.value) return; 
+
+        
         scannerController.stop();
 
-        Get.snackbar(
-          "Barcode Ditemukan",
-          "Kode: ${barcode.rawValue}",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
+        try {
+          isLoading.value = true;
+          final upc = barcode.rawValue!;
+
+          
+          final result = await FoodService.to.searchFoodByUpc(upc);
+
+          isLoading.value = false;
+
+          if (result != null) {
+            
+            _showScanResultSheet(result);
+          }
+        } catch (e) {
+          isLoading.value = false;
+          Get.snackbar(
+            "Gagal",
+            "Produk tidak ditemukan atau error: ${e.toString().replaceAll('Exception: ', '')}",
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+
+          
+          await Future.delayed(const Duration(seconds: 2));
+          if (!isPhotoMode.value) {
+            scannerController.start();
+          }
+        }
+        break; 
       }
     }
   }
 
 
-  // --- BOTTOM SHEET HASIL AI (UPDATED STYLE) ---
-  void _showScanResultSheet(Map<String, dynamic> data, File imageFile) {
-    // Set default meal type based on time
+  
+  void _showScanResultSheet(Map<String, dynamic> data, {File? imageFile}) {
+    
     final hour = DateTime.now().hour;
     if (hour >= 11 && hour < 16) {
       selectedMealType.value = 'Lunch';
@@ -187,15 +213,15 @@ class CamController extends GetxController {
 
     Get.bottomSheet(
       Container(
-        height: 0.85.sh, // Tinggi sheet hampir full screen agar muat banyak detail
+        height: 0.85.sh, 
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AppColors.secondaryWhite, // Background agak abu-abu seperti detail page
+          color: AppColors.secondaryWhite, 
           borderRadius: BorderRadius.vertical(top: Radius.circular(32.r)),
         ),
         child: Column(
           children: [
-            // Drag Handle
+            
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.h),
               child: Container(
@@ -208,35 +234,55 @@ class CamController extends GetxController {
               ),
             ),
 
-            // Scrollable Content
+            
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Gambar Preview (Rounded seperti Detail View)
+                    
                     Center(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(24.r),
-                        child: Image.file(
+                        child: imageFile != null
+                            ? Image.file(
                           imageFile,
                           width: double.infinity,
                           height: 250.h,
                           fit: BoxFit.cover,
+                        )
+                            : (data['imageUrl'] != null && data['imageUrl'].toString().isNotEmpty)
+                            ? Image.network(
+                          data['imageUrl'],
+                          width: double.infinity,
+                          height: 250.h,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            height: 250.h,
+                            width: double.infinity,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                          ),
+                        )
+                            : Container(
+                          height: 250.h,
+                          width: double.infinity,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.fastfood, size: 80, color: Colors.grey),
                         ),
                       ),
                     ),
                     SizedBox(height: 24.h),
 
-                    // Title
+                    
                     Text(
                       data['name'] ?? 'Makanan Terdeteksi',
                       style: AppTextStyles.foodTitle,
                     ),
                     SizedBox(height: 12.h),
 
-                    // Tags Row (Kalori, Serving, Prep Time)
+                    
                     Wrap(
                       spacing: 8.w,
                       runSpacing: 8.h,
@@ -262,7 +308,7 @@ class CamController extends GetxController {
                     ),
                     SizedBox(height: 24.h),
 
-                    // --- DROPDOWN MEAL TYPE ---
+                    
                     Text("Dimakan saat?", style: AppTextStyles.labelBold),
                     SizedBox(height: 8.h),
                     Container(
@@ -290,7 +336,7 @@ class CamController extends GetxController {
                     ),
                     SizedBox(height: 24.h),
 
-                    // --- INFORMASI NUTRISI ---
+                    
                     if (data['nutritionFacts'] != null && (data['nutritionFacts'] as List).isNotEmpty) ...[
                       Text('Informasi Nutrisi', style: AppTextStyles.foodLabel),
                       SizedBox(height: 12.h),
@@ -318,7 +364,7 @@ class CamController extends GetxController {
                       SizedBox(height: 24.h),
                     ],
 
-                    // --- BAHAN-BAHAN ---
+                    
                     if (data['ingredients'] != null && (data['ingredients'] as List).isNotEmpty) ...[
                       Text('Bahan', style: AppTextStyles.foodLabel),
                       SizedBox(height: 12.h),
@@ -346,7 +392,7 @@ class CamController extends GetxController {
                       SizedBox(height: 24.h),
                     ],
 
-                    // --- DESKRIPSI (Optional) ---
+                    
                     if (data['description'] != null) ...[
                       Text('Deskripsi', style: AppTextStyles.foodLabel),
                       SizedBox(height: 8.h),
@@ -357,14 +403,14 @@ class CamController extends GetxController {
                       SizedBox(height: 24.h),
                     ],
 
-                    // Space agar konten tidak tertutup tombol
+                    
                     SizedBox(height: 100.h),
                   ],
                 ),
               ),
             ),
 
-            // --- ACTION BUTTONS (FIXED BOTTOM) ---
+            
             Container(
               padding: EdgeInsets.all(24.w),
               decoration: BoxDecoration(
@@ -408,12 +454,17 @@ class CamController extends GetxController {
       ),
       isScrollControlled: true,
     ).then((_) {
-      // Reset loading state jika ditutup manual
+      
       isLoading.value = false;
+
+      
+      if (!isPhotoMode.value) {
+        scannerController.start();
+      }
     });
   }
 
-  // --- WIDGET HELPER: Tag (Pill Shape) ---
+  
   Widget _buildTag(String text, Color color, IconData icon) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
@@ -456,22 +507,33 @@ class CamController extends GetxController {
 
   void _saveScanLog(Map<String, dynamic> data) async {
     try {
-      // 1. Matikan kamera dulu
       await _disposeCamera();
+      scannerController.stop();
 
-      Get.back(); // Tutup bottom sheet
+      Get.back();
       isLoading.value = true;
 
       String mealType = selectedMealType.value;
 
-      final logData = {
-        ...data,
-        'mealType': mealType,
-        'date': DateTime.now().toIso8601String().split('T')[0],
-        'servingsConsumed': 1
-      };
+      if (data.containsKey('upcCode')) {
+        final logData = {
+          'mealType': mealType,
+          'date': DateTime.now().toIso8601String().split('T')[0],
+          'servingsConsumed': 1
+        };
 
-      await FoodService.to.scanAndLogFood(logData);
+        await FoodService.to.logFoodByUpc(data['upcCode'], logData);
+
+      } else {
+        final logData = {
+          ...data,
+          'mealType': mealType,
+          'date': DateTime.now().toIso8601String().split('T')[0],
+          'servingsConsumed': 1
+        };
+
+        await FoodService.to.scanAndLogFood(logData);
+      }
 
       isLoading.value = false;
 
@@ -481,13 +543,14 @@ class CamController extends GetxController {
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
-
-      // Navigasi aman kembali ke halaman utama
       Get.until((route) => route.settings.name == Routes.BOTNAVBAR);
 
     } catch (e) {
       isLoading.value = false;
       Get.snackbar('Gagal', 'Gagal menyimpan log: $e');
+      if (!isPhotoMode.value) {
+        scannerController.start();
+      }
     }
   }
 }
