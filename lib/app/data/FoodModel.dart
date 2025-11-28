@@ -6,6 +6,7 @@ class FoodModel {
   final int? prepTime;
   final int? cookTime;
   final int? servings;
+  final String? servingType; // Updated: Menambahkan field servingType
   final List<StepModel> steps;
   final List<NutritionFactModel> nutritionFacts;
   final List<IngredientModel> ingredients;
@@ -18,6 +19,7 @@ class FoodModel {
     this.prepTime,
     this.cookTime,
     this.servings,
+    this.servingType, // Updated: Constructor param
     this.steps = const [],
     this.nutritionFacts = const [],
     this.ingredients = const [],
@@ -32,6 +34,7 @@ class FoodModel {
       prepTime: json['prepTime'],
       cookTime: json['cookTime'],
       servings: json['servings'],
+      servingType: json['servingType'], // Updated: Mapping dari JSON
       steps: (json['steps'] as List<dynamic>?)
           ?.map((e) => StepModel.fromJson(e))
           .toList() ??

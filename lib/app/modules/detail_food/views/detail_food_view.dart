@@ -75,7 +75,7 @@ class DetailFoodView extends GetView<DetailFoodController> {
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         IconButton(
                           onPressed: () {
@@ -157,7 +157,8 @@ class DetailFoodView extends GetView<DetailFoodController> {
                                           Padding(
                                             padding: EdgeInsets.only(left: 6.w),
                                             child: _buildTag(
-                                                '${food.servings} porsi',
+                                              // Updated: Menggunakan servingType
+                                                '${food.servings} ${food.servingType ?? 'porsi'}',
                                                 AppColors.yellow,
                                                 Icons.restaurant_menu
                                             ),

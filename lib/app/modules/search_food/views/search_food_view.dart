@@ -169,7 +169,8 @@ class SearchFoodView extends GetView<SearchFoodController> {
                                         text: TextSpan(
                                           children: [
                                             TextSpan(
-                                              text: '${food.servings ?? 1} Porsi ',
+                                              // Updated: Menggunakan servingType jika tersedia, default 'Porsi'
+                                              text: '${food.servings ?? 1} ${food.servingType ?? 'Porsi'} ',
                                               style: AppTextStyles.bodyLight.copyWith(
                                                 color: AppColors.primary,
                                               ),
