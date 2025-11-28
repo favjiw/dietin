@@ -1,3 +1,4 @@
+import 'package:dietin/app/routes/app_pages.dart';
 import 'package:dietin/app/shared/constants/constant.dart';
 import 'package:dietin/app/shared/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
@@ -230,7 +231,7 @@ class SearchFoodView extends GetView<SearchFoodController> {
           ),
           backgroundColor: AppColors.primary,
           onPressed: () {
-            // TODO: Implement Scan Feature
+            Get.toNamed(Routes.CAM);
           },
           child: SvgPicture.asset(
             'assets/images/scan_ic.svg',

@@ -242,7 +242,7 @@ class CamController extends GetxController {
                       runSpacing: 8.h,
                       children: [
                         _buildTag(
-                            '${data['nutritionFacts'] != null ? _findNutrientValue(data['nutritionFacts'], 'Kalori') : 0} kkal',
+                            '${data['nutritionFacts'] != null ? _findNutrientValue(data['nutritionFacts'], 'Kalori') : 0}',
                             AppColors.primary,
                             Icons.local_fire_department
                         ),
@@ -380,16 +380,25 @@ class CamController extends GetxController {
               child: Column(
                 children: [
                   CustomButton(
-                    text: 'Simpan ke Jurnal',
+                    text: 'Tambah Makanan',
+                    backgroundColor: AppColors.mainBlack,
+                    borderRadius: 64,
+                    textStyle: AppTextStyles.label.copyWith(
+                      color: AppColors.light,
+                      fontSize: 18.sp,
+                    ),
                     onPressed: () => _saveScanLog(data),
-                    backgroundColor: AppColors.primary,
                   ),
                   SizedBox(height: 12.h),
                   CustomButton(
                     text: 'Batal',
+                    borderRadius: 64,
                     backgroundColor: Colors.transparent,
-                    textStyle: AppTextStyles.label.copyWith(color: Colors.grey),
                     onPressed: () => Get.back(),
+                    textStyle: AppTextStyles.label.copyWith(
+                      color: AppColors.darkGrey,
+                      fontSize: 18.sp,
+                    ),
                   ),
                 ],
               ),

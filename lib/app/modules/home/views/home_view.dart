@@ -165,7 +165,7 @@ class HomeView extends GetView<HomeController> {
                   }),
 
                   SizedBox(height: 24.h),
-                  Text('Jurnal Makanan', style: AppTextStyles.labelBold),
+                  Text('Tambah Makanan', style: AppTextStyles.labelBold),
                   SizedBox(height: 16.h),
 
                   // --- MEAL SECTIONS ---

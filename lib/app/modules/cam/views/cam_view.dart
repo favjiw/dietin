@@ -82,7 +82,7 @@ class CamView extends GetView<CamController> {
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Text(
-                  controller.isPhotoMode.value ? 'AI Food Scan' : 'Barcode Scan',
+                  controller.isPhotoMode.value ? 'Pindai Makanan' : 'Pindai Barcode',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
