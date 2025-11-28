@@ -7,7 +7,7 @@ class NotificationController extends GetxController {
   final isLoading = true.obs;
   final groups = <NotificationGroup>[].obs;
 
-  // ubah ke true/false untuk simulasi kosong / tidak kosong
+  
   final bool simulateEmpty = true;
 
   @override

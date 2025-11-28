@@ -35,7 +35,7 @@ class HomeView extends GetView<HomeController> {
                 children: [
                   SizedBox(height: 11.h),
 
-                  // --- HEADER USER ---
+                  
                   Obx(() {
                     final isLoading = controller.isLoading.value;
                     final user = controller.user.value;
@@ -109,7 +109,7 @@ class HomeView extends GetView<HomeController> {
                   Text('Asupan Harian', style: AppTextStyles.labelBold),
                   SizedBox(height: 16.h),
 
-                  // --- PROGRESS BAR NUTRISI ---
+                  
                   Obx(() {
                     return Column(
                       children: [
@@ -168,7 +168,7 @@ class HomeView extends GetView<HomeController> {
                   Text('Tambah Makanan', style: AppTextStyles.labelBold),
                   SizedBox(height: 16.h),
 
-                  // --- MEAL SECTIONS ---
+                  
                   Obx(() => _buildMealSection(
                     title: 'Sarapan',
                     iconAsset: 'assets/images/sunrise_ic.svg',
@@ -211,36 +211,29 @@ class HomeView extends GetView<HomeController> {
     final bool hasData = log != null && log.items.isNotEmpty;
 
     if (hasData) {
-      // 1. LOGIKA GROUPING ITEM
-      // Kita gabungkan item dengan foodId yang sama agar tampil sebagai satu baris "X Porsi"
       final Map<int, FoodLogItemModel> groupedItems = {};
 
-      for (var item in log!.items) {
-        final foodId = item.foodId; // ID unik makanan
-
+      for (var item in log.items) {
+        final foodId = item.foodId;
         if (groupedItems.containsKey(foodId)) {
-          // Jika sudah ada, update (akumulasi) servings dan calories
           final existing = groupedItems[foodId]!;
           groupedItems[foodId] = FoodLogItemModel(
-            id: existing.id, // ID dummy, tidak terlalu penting untuk tampilan
+            id: existing.id, 
             foodId: foodId,
-            servings: existing.servings + item.servings, // Jumlahkan Porsi
-            calories: existing.calories + item.calories, // Jumlahkan Kalori
-            food: existing.food, // Data makanan tetap sama
+            servings: existing.servings + item.servings, 
+            calories: existing.calories + item.calories, 
+            food: existing.food, 
           );
         } else {
-          // Jika belum ada, tambahkan sebagai entry baru
+          
           groupedItems[foodId] = item;
         }
       }
 
-      // Konversi map kembali ke list untuk ListView
       final displayList = groupedItems.values.toList();
 
-      // 2. Total Kalori Header (Tetap hitung dari semua item mentah agar akurat)
       final sectionCalories = log.items.fold(0, (sum, item) => sum + item.calories);
 
-      // OPEN CONTAINER
       return Container(
         width: 1.sw,
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
@@ -276,7 +269,6 @@ class HomeView extends GetView<HomeController> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        // Menampilkan total akumulasi kalori di header
                         Text('$sectionCalories', style: AppTextStyles.bodySmallSemiBold),
                         Text('kalori', style: AppTextStyles.bodySmall),
                       ],
@@ -302,7 +294,6 @@ class HomeView extends GetView<HomeController> {
               child: Divider(color: AppColors.lightGrey.withValues(alpha: 0.3), thickness: 1),
             ),
 
-            // Render list menggunakan DATA YANG SUDAH DI-GROUPING (displayList)
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -312,7 +303,6 @@ class HomeView extends GetView<HomeController> {
                 final item = displayList[index];
                 final foodName = item.food?.name ?? 'Makanan';
 
-                // Format porsi agar rapi (misal 3.0 -> 3)
                 String servingText = item.servings % 1 == 0
                     ? item.servings.toInt().toString()
                     : item.servings.toString();
@@ -328,12 +318,11 @@ class HomeView extends GetView<HomeController> {
                           children: [
                             Text(foodName, style: AppTextStyles.bodySmallSemiBold),
                             SizedBox(height: 4.h),
-                            // Menampilkan total porsi yang sudah digabung
                             Text('$servingText Porsi', style: AppTextStyles.bodyLight),
                           ],
                         ),
                       ),
-                      // Menampilkan total kalori item ini (setelah dikali porsi)
+                      
                       Text('${item.calories} kkal', style: AppTextStyles.bodyLight),
                     ],
                   ),
@@ -344,7 +333,6 @@ class HomeView extends GetView<HomeController> {
         ),
       );
     } else {
-      // CLOSED CONTAINER (Tampilan Kosong)
       return Container(
         width: 1.sw,
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),

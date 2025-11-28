@@ -6,9 +6,9 @@ import 'package:get_storage/get_storage.dart';
 
 class ProfileController extends GetxController {
   var name = 'Gilang Nanda Saputra'.obs;
-  var height = 160.obs; // cm
-  var weight = 61.obs;  // kg
-  var age = 20.obs;     // tahun
+  var height = 160.obs; 
+  var weight = 61.obs;  
+  var age = 20.obs;     
   var timeZone = '07.00 WIB'.obs;
 
   var isLoading = false.obs;

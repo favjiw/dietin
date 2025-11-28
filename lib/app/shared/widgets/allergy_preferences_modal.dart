@@ -24,7 +24,7 @@ class AllergyPreferenceModal extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Drag Indicator
+          
           Center(
             child: Container(
               width: 40,
@@ -40,7 +40,7 @@ class AllergyPreferenceModal extends StatelessWidget {
           Center(child: Text('Preferensi Alergi', style: AppTextStyles.headingAppBar)),
           SizedBox(height: 20.h),
 
-          /// Dua kolom responif
+          
           Obx(() {
             final sel = controller.allergies;
 

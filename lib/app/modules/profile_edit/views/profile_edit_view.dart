@@ -71,7 +71,7 @@ class ProfileEditView extends GetView<ProfileEditController> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.only(bottom: 100.h), // Ruang untuk tombol simpan
+                  padding: EdgeInsets.only(bottom: 100.h), 
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -81,9 +81,9 @@ class ProfileEditView extends GetView<ProfileEditController> {
                             CircleAvatar(
                               radius: 60,
                               backgroundColor: AppColors.primary,
-                              // Ganti dengan logic URL/placeholder foto profil Anda
+                              
                               backgroundImage: const NetworkImage(
-                                'https://picsum.photos/200/200',
+                                'https://picsum.photos/100/100'
                               ),
                             ),
                             Positioned(
@@ -104,7 +104,7 @@ class ProfileEditView extends GetView<ProfileEditController> {
                                 child: IconButton(
                                   icon: const Icon(Icons.camera_alt, size: 20),
                                   onPressed: () {
-                                    // TODO: Implementasi ganti foto profil
+                                    
                                   },
                                 ),
                               ),
@@ -113,7 +113,7 @@ class ProfileEditView extends GetView<ProfileEditController> {
                         ),
                       ),
                       SizedBox(height: 24.h),
-                      // use customtextfield
+                      
                       CustomTextField(
                         labelText: 'Nama Lengkap',
                         hintText: 'Nama Lengkap',
@@ -256,7 +256,7 @@ class ProfileEditView extends GetView<ProfileEditController> {
                 ),
               ),
 
-              // Tombol Simpan (Fixed di bawah)
+              
               Positioned(
                 bottom: 0,
                 left: 0,

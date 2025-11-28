@@ -2,7 +2,7 @@ import 'package:dietin/app/modules/home/views/home_view.dart';
 import 'package:dietin/app/modules/meals/views/meals_view.dart';
 import 'package:dietin/app/modules/profile/views/profile_view.dart';
 import 'package:dietin/app/modules/statistics/views/statistics_view.dart';
-import 'package:dietin/app/routes/app_pages.dart'; // Pastikan import Routes
+import 'package:dietin/app/routes/app_pages.dart'; 
 import 'package:dietin/app/shared/constants/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,13 +17,10 @@ class BotnavbarView extends GetView<BotnavbarController> {
 
   @override
   Widget build(BuildContext context) {
-    // Controller tidak didaftarkan di sini lagi
-    // Binding akan menangani semua lazyPut
-
     final List<Widget> pages = const [
       HomeView(),
       MealsView(),
-      SizedBox(), // Halaman dummy karena tombol tengah navigasi ke route lain
+      SizedBox(), 
       StatisticsView(),
       ProfileView(),
     ];
@@ -101,7 +98,7 @@ class BotnavbarView extends GetView<BotnavbarController> {
                           ],
                         ),
                       ),
-                      SizedBox(width: 24.w, height: 24.h), // Space untuk tombol tengah
+                      SizedBox(width: 24.w, height: 24.h), 
                       InkWell(
                         onTap: () {
                           controller.currentIndex.value = 3;
@@ -163,9 +160,9 @@ class BotnavbarView extends GetView<BotnavbarController> {
                     borderRadius: BorderRadius.circular(25.r),
                   ),
                   child: InkWell(
-                    // PERUBAHAN DI SINI:
-                    // Saat diklik, langsung navigasi ke Routes.CAM
-                    // Tidak mengubah currentIndex agar botnavbar tetap di tab sebelumnya
+                    
+                    
+                    
                     onTap: () {
                       Get.toNamed(Routes.CAM);
                     },

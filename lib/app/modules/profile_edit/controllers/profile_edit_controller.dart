@@ -7,20 +7,20 @@ import 'package:get/get.dart';
 class ProfileEditController extends GetxController {
   final UserServices _userServices = Get.find<UserServices>();
 
-  // Text Controllers
+  
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController birthDateController = TextEditingController();
   TextEditingController heightController = TextEditingController();
   TextEditingController weightController = TextEditingController();
 
-  // Observable Status
+  
   var user = Rxn<UserModel>();
   var isLoading = false.obs;
   var isSaving = false.obs;
   var errorMessage = ''.obs;
 
-  // Observable Data (untuk sinkronisasi UI)
+  
   var fullName = ''.obs;
   var email = ''.obs;
   var birthDate = ''.obs;
@@ -29,7 +29,7 @@ class ProfileEditController extends GetxController {
   RxList<String> allergies = <String>[].obs;
   List<String> get selectedAllergies => allergies;
 
-  // init textfield with current values
+  
   @override
   void onInit() {
     super.onInit();
@@ -40,7 +40,7 @@ class ProfileEditController extends GetxController {
     fullName.value = fetchedUser.name;
     email.value = fetchedUser.email;
     birthDate.value = fetchedUser.birthDate != null
-        ? fetchedUser.birthDate!.toLocal().toString().split(' ')[0] // Format sederhana YYYY-MM-DD
+        ? fetchedUser.birthDate!.toLocal().toString().split(' ')[0] 
         : '';
     height.value = fetchedUser.height?.toString() ?? '';
     weight.value = fetchedUser.weight?.toString() ?? '';
@@ -73,7 +73,7 @@ class ProfileEditController extends GetxController {
     }
   }
 
-  // TODO: Hubungkan fungsi ini ke UserService.updateProfile (endpoint belum ada)
+  
   Future<void> updateProfile() async {
     if (fullNameController.text.isEmpty || emailController.text.isEmpty) {
       Get.snackbar('Error', 'Nama dan Email tidak boleh kosong.', snackPosition: SnackPosition.TOP, backgroundColor: Colors.red, colorText: Colors.white);
@@ -84,20 +84,20 @@ class ProfileEditController extends GetxController {
       isSaving.value = true;
       errorMessage.value = '';
 
-      // --- Simulasi Update API (Ganti dengan panggilan API sebenarnya) ---
+      
       await Future.delayed(const Duration(seconds: 2));
 
-      // Simulasi berhasil: update state lokal dan berikan notifikasi
+      
       fullName.value = fullNameController.text.trim();
       email.value = emailController.text.trim();
       height.value = heightController.text.trim();
       weight.value = weightController.text.trim();
-      birthDate.value = birthDateController.text.trim(); // asumsikan format valid
-      // Note: Di dunia nyata, Anda harus mengirim data ini ke server.
+      birthDate.value = birthDateController.text.trim(); 
+      
 
       Get.snackbar('Berhasil', 'Profil berhasil diperbarui.', snackPosition: SnackPosition.TOP, backgroundColor: Colors.green, colorText: Colors.white);
 
-      // Update data di ProfileController (jika ada di hirarki sebelumnya)
+      
       if (Get.isRegistered<ProfileController>()) {
         Get.find<ProfileController>().fetchUser();
       }

@@ -1,6 +1,7 @@
 import 'package:dietin/app/data/FoodLogModel.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class FoodLogService extends GetConnect {
   static FoodLogService get to => Get.find<FoodLogService>();
@@ -8,7 +9,7 @@ class FoodLogService extends GetConnect {
 
   @override
   void onInit() {
-    httpClient.baseUrl = 'https://selma-unrecorded-dearly.ngrok-free.dev';
+    httpClient.baseUrl = dotenv.env['BASE_URL'] ?? 'http://localhost:3000';
     httpClient.timeout = const Duration(seconds: 30);
 
     httpClient.addRequestModifier<dynamic>((request) {
@@ -65,11 +66,8 @@ class FoodLogService extends GetConnect {
     }
   }
 
-  // --- NEW: Get All Food Logs (dengan limit) ---
   Future<List<FoodLogModel>> getAllFoodLogs({int limit = 100}) async {
     try {
-      // Menggunakan limit 100 agar cukup untuk statistik bulanan
-      // Backend query param: ?limit=100
       final response = await get('/food-logs', query: {'limit': limit.toString()});
 
       if (response.status.hasError) {
@@ -77,7 +75,6 @@ class FoodLogService extends GetConnect {
       }
 
       final body = response.body;
-      // Sesuaikan parsing dengan struktur response backend (response -> payload)
       if (body != null && body['response'] != null && body['response']['payload'] != null) {
         final List<dynamic> payload = body['response']['payload'];
         return payload.map((e) => FoodLogModel.fromJson(e)).toList();

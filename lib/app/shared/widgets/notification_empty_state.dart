@@ -13,7 +13,7 @@ class NotificationEmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // ganti dengan Image.asset sesuai asset-mu
+            
             SizedBox(
               width: 200.w,
               height: 200.w,

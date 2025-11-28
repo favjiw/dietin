@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../data/UserModel.dart';
 import '../network/endpoint.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class UserServices extends GetConnect {
   static UserServices get to => Get.find<UserServices>();
@@ -16,7 +17,7 @@ class UserServices extends GetConnect {
 
   @override
   void onInit() {
-    httpClient.baseUrl = 'https://selma-unrecorded-dearly.ngrok-free.dev';
+    httpClient.baseUrl = dotenv.env['BASE_URL'] ?? 'http://localhost:3000';
     httpClient.timeout = const Duration(seconds: 30);
     super.onInit();
   }

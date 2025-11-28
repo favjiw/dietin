@@ -48,11 +48,11 @@ class StatisticsView extends GetView<StatisticsController> {
                 ),
                 SizedBox(height: 20.h),
 
-                // Content Area (Chart)
-                // Menggunakan Obx agar rebuild saat tab/data berubah
+                
+                
                 Obx(() {
                   if (controller.isLoading.value && controller.allLogs.isEmpty) {
-                    return Container(
+                    return SizedBox(
                       height: 300.h,
                       child: const Center(child: CircularProgressIndicator()),
                     );
@@ -268,7 +268,7 @@ class StatisticsView extends GetView<StatisticsController> {
         child: Column(
           children: [
             SizedBox(height: 20.h),
-            // Bar Chart
+            
             Container(
               height: 200.h,
               padding: EdgeInsets.all(16.w),
@@ -367,7 +367,7 @@ class StatisticsView extends GetView<StatisticsController> {
               ),
             ),
             SizedBox(height: 30.h),
-            // Detail Section
+            
             Obx(() {
               final selectedIndex = controller.selectedDayIndex.value;
 
@@ -518,7 +518,7 @@ class StatisticsView extends GetView<StatisticsController> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(height: 20.h),
-            // Filter Bulan dan Tahun
+            
             Row(
               children: [
                 Expanded(
@@ -596,7 +596,7 @@ class StatisticsView extends GetView<StatisticsController> {
               ],
             ),
             SizedBox(height: 16.h),
-            // Navigasi Rentang Tanggal
+            
             Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
@@ -644,7 +644,7 @@ class StatisticsView extends GetView<StatisticsController> {
               ),
             ),
             SizedBox(height: 20.h),
-            // Line Chart
+            
             Container(
               width: double.infinity,
               height: 250.h,
@@ -670,7 +670,7 @@ class StatisticsView extends GetView<StatisticsController> {
               ),
             ),
             SizedBox(height: 20.h),
-            // Summary
+            
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(16.w),
@@ -687,7 +687,7 @@ class StatisticsView extends GetView<StatisticsController> {
               ),
               child: Builder(
                 builder: (context) {
-                  // Calculate statistics
+                  
                   final values = days
                       .map((day) => day['value'] as int)
                       .toList();
@@ -770,7 +770,7 @@ class StatisticsView extends GetView<StatisticsController> {
             painter: CircularProgressPainter(sections: sections, total: total),
           ),
         ),
-        // Center text
+        
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

@@ -11,12 +11,6 @@ class LoginController extends GetxController {
   var isObscure = true.obs;
   var isLoading = false.obs;
 
-  final GetStorage _storage = GetStorage();
-  static const String _initialCompletedKey = 'initial_health_completed';
-  static const String _isLoggedInKey = 'is_logged_in';
-  static const String _accessTokenKey = 'accessToken';
-  static const String _refreshTokenKey = 'refreshToken';
-
   void toggle() {
     isObscure.value = !isObscure.value;
   }

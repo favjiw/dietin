@@ -23,7 +23,7 @@ class SplashController extends GetxController {
       final String? accessToken = _storage.read<String>(_accessTokenKey);
       final String? refreshToken = _storage.read<String>(_refreshTokenKey);
 
-      // debug log / print token dan status
+      
       print('[Splash] hasSeenOnboarding=$hasSeenOnboarding');
       print('[Splash] isLoggedIn=$isLoggedIn');
       print('[Splash] isInitialCompleted=$isInitialCompleted');
@@ -36,7 +36,7 @@ class SplashController extends GetxController {
             'accessToken=$accessToken refreshToken=$refreshToken',
       );
 
-      // 1. Jika sudah login, lewati onboarding
+      
       if (isLoggedIn) {
         if (isInitialCompleted) {
           Get.offNamed('/botnavbar');
@@ -46,7 +46,7 @@ class SplashController extends GetxController {
         return;
       }
 
-      // 2. Belum login: cek apakah sudah pernah lihat onboarding
+      
       if (!hasSeenOnboarding) {
         Get.offNamed('/onboarding');
       } else {

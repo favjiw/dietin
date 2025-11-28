@@ -22,7 +22,7 @@ class RegisterController extends GetxController {
   }
 
   Future<void> register() async {
-    // Validasi input
+    
     if (nameController.text.trim().isEmpty ||
         emailController.text.trim().isEmpty ||
         passwordController.text.trim().isEmpty ||
@@ -68,19 +68,19 @@ class RegisterController extends GetxController {
         colorText: Colors.white,
       );
 
-      // Clear form setelah sukses
+      
       nameController.clear();
       emailController.clear();
       passwordController.clear();
       confirmPasswordController.clear();
 
-      // Arahkan ke login page
+      
       Get.offAllNamed('/login');
 
     } catch (e) {
       String errorMessage = e.toString();
 
-      // Handle specific error messages
+      
       if (errorMessage.contains('Email already exists')) {
         errorMessage = 'Email sudah terdaftar. Silakan gunakan email lain.';
       } else if (errorMessage.contains('Invalid email')) {

@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 class FoodModel {
   final int id;
   final String name;
@@ -6,7 +8,7 @@ class FoodModel {
   final int? prepTime;
   final int? cookTime;
   final int? servings;
-  final String? servingType; // Updated: Menambahkan field servingType
+  final String? servingType; 
   final List<StepModel> steps;
   final List<NutritionFactModel> nutritionFacts;
   final List<IngredientModel> ingredients;
@@ -19,7 +21,7 @@ class FoodModel {
     this.prepTime,
     this.cookTime,
     this.servings,
-    this.servingType, // Updated: Constructor param
+    this.servingType, 
     this.steps = const [],
     this.nutritionFacts = const [],
     this.ingredients = const [],
@@ -34,7 +36,7 @@ class FoodModel {
       prepTime: json['prepTime'],
       cookTime: json['cookTime'],
       servings: json['servings'],
-      servingType: json['servingType'], // Updated: Mapping dari JSON
+      servingType: json['servingType'], 
       steps: (json['steps'] as List<dynamic>?)
           ?.map((e) => StepModel.fromJson(e))
           .toList() ??
@@ -50,7 +52,7 @@ class FoodModel {
     );
   }
 
-  // Helper untuk mengambil kalori dengan cepat
+  
   String get calories {
     final fact = nutritionFacts.firstWhere(
           (element) => element.name.toLowerCase().contains('kalori'),
