@@ -15,10 +15,8 @@ class CamView extends GetView<CamController> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // LAYER 1: TAMPILAN KAMERA / SCANNER
           Obx(() {
             if (controller.isPhotoMode.value) {
-              // --- MODE FOTO (AI SCAN) ---
               if (controller.isCameraInitialized.value &&
                   controller.cameraController != null &&
                   controller.cameraController!.value.isInitialized) {
@@ -31,12 +29,10 @@ class CamView extends GetView<CamController> {
                 return const Center(child: CircularProgressIndicator());
               }
             } else {
-              // --- MODE SCAN (BARCODE) ---
               return MobileScanner(
                 controller: controller.scannerController,
                 onDetect: controller.onBarcodeDetect,
                 fit: BoxFit.cover,
-                // Gunakan overlay builder bawaan package atau custom container di atasnya
                 overlayBuilder: (context, constraints) {
                   return Container(
                     decoration: BoxDecoration(
@@ -48,7 +44,7 @@ class CamView extends GetView<CamController> {
                     ),
                     margin: EdgeInsets.symmetric(
                         horizontal: 50.w,
-                        vertical: 0.25.sh // Agar kotak ada di tengah agak ke atas
+                        vertical: 0.25.sh 
                     ),
                   );
                 },
@@ -56,7 +52,6 @@ class CamView extends GetView<CamController> {
             }
           }),
 
-          // LAYER 2: HEADER & TOMBOL KEMBALI
           Positioned(
             top: 50.h,
             left: 20.w,
@@ -69,7 +64,6 @@ class CamView extends GetView<CamController> {
             ),
           ),
 
-          // Judul Mode di Atas (Opsional, agar user tau sedang mode apa)
           Positioned(
             top: 60.h,
             left: 0,
@@ -93,7 +87,6 @@ class CamView extends GetView<CamController> {
             ),
           ),
 
-          // LAYER 3: CONTROLS AREA (BAWAH)
           Positioned(
             bottom: 0,
             left: 0,
@@ -110,7 +103,6 @@ class CamView extends GetView<CamController> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // 1. TOMBOL SHUTTER (HANYA DI MODE FOTO)
                   Obx(() {
                     if (controller.isPhotoMode.value) {
                       return GestureDetector(
@@ -138,14 +130,13 @@ class CamView extends GetView<CamController> {
                         ),
                       );
                     } else {
-                      // Spacer agar layout selector tidak naik turun
+                      
                       return SizedBox(height: 80.w);
                     }
                   }),
 
                   SizedBox(height: 30.h),
 
-                  // 2. SELECTOR MODE (PHOTO / SCAN)
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
                     decoration: BoxDecoration(
@@ -165,7 +156,6 @@ class CamView extends GetView<CamController> {
             ),
           ),
 
-          // LAYER 4: LOADING OVERLAY FULL SCREEN (Opsional, jika ingin memblokir interaksi saat upload)
           Obx(() => controller.isLoading.value
               ? Container(
             color: Colors.black54,

@@ -27,9 +27,9 @@ class CaloriePill extends StatelessWidget {
         height: 96,
         child: Stack(
           children: [
-            // background
+            
             Container(color: bg),
-            // fill horizontal
+            
             Align(
               alignment: Alignment.centerLeft,
               child: FractionallySizedBox(
@@ -40,7 +40,7 @@ class CaloriePill extends StatelessWidget {
                 ),
               ),
             ),
-            // content
+            
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

@@ -29,7 +29,7 @@ class ProfileView extends GetView<ProfileController> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // indikator loading (opsional, tidak menutupi konten)
+                
                 if (controller.isLoading.value)
                   Padding(
                     padding: EdgeInsets.only(bottom: 8.h),
@@ -49,7 +49,7 @@ class ProfileView extends GetView<ProfileController> {
                     ),
                   ),
 
-                // tampilan error singkat, tapi konten tetap tampil
+                
                 if (controller.errorMessage.value.isNotEmpty)
                   Padding(
                     padding: EdgeInsets.only(bottom: 8.h),
@@ -72,7 +72,7 @@ class ProfileView extends GetView<ProfileController> {
                     ),
                   ),
 
-                // kartu profil utama
+                
                 Container(
                   padding: EdgeInsets.all(16.w),
                   decoration: BoxDecoration(
@@ -91,7 +91,7 @@ class ProfileView extends GetView<ProfileController> {
                               CircleAvatar(
                                 radius: 32.r,
                                 backgroundImage: const NetworkImage(
-                                  'https://picsum.photos/100/100',
+                                  'https://picsum.photos/100/100'
                                 ),
                                 backgroundColor: AppColors.primary,
                               ),
@@ -164,7 +164,7 @@ class ProfileView extends GetView<ProfileController> {
                 ),
                 SizedBox(height: 16.h),
 
-                // cards info pribadi
+                
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -187,7 +187,7 @@ class ProfileView extends GetView<ProfileController> {
                 ),
                 SizedBox(height: 12.h),
 
-                // menu list termasuk logout
+                
                 Expanded(
                   child: ListView(
                     children: [
@@ -195,21 +195,21 @@ class ProfileView extends GetView<ProfileController> {
                         icon: Icons.person_outline,
                         label: 'Detail Personal',
                         onTap: () {
-                          // Navigate to detail personal
+                          
                         },
                       ),
                       ProfileMenuItem(
                         icon: Icons.settings_outlined,
                         label: 'Pengaturan',
                         onTap: () {
-                          // Navigate to settings
+                          
                         },
                       ),
                       ProfileMenuItem(
                         icon: Icons.info_outline,
                         label: 'Tentang Kami',
                         onTap: () {
-                          // Navigate to about us
+                          
                         },
                       ),
                       ProfileMenuItem(

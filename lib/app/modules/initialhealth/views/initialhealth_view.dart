@@ -63,7 +63,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                       controller: controller.pageController,
                       onPageChanged: controller.updatePageIndex,
                       children: [
-                        // PAGE 0
+                        
                         Form(
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -71,7 +71,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(height: 52.h),
-                                // GANTI seluruh Obx(() { final controller = Get.find<InitialhealthController>(); ... })
+                                
                                 Obx(() {
                                   return Column(
                                     crossAxisAlignment:
@@ -339,7 +339,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                             ),
                           ),
                         ),
-                        // PAGE 1
+                        
                         Form(
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -665,7 +665,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                             ),
                           ),
                         ),
-                        // PAGE 2
+                        
                         Form(
                           child: SingleChildScrollView(
                             child: Padding(
@@ -785,7 +785,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                       ],
                     ),
                   ),
-                  // FOOTER: indikator + tombol
+                  
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 40.h),
                     child: SizedBox(
@@ -817,7 +817,7 @@ class InitialhealthView extends GetView<InitialhealthController> {
                           }),
                           SizedBox(height: 40.h),
 
-                          // tombol next/selesai
+                          
                           Obx(() {
                             final isLast =
                                 controller.pageIndex.value == totalPages - 1;

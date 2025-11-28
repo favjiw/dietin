@@ -58,7 +58,7 @@ class MealsView extends GetView<MealsController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Obx(() {
-                        // Loading state
+                        
                         if (controller.isLoading.value) {
                           return Padding(
                             padding: EdgeInsets.only(top: 50.h),
@@ -68,7 +68,7 @@ class MealsView extends GetView<MealsController> {
                           );
                         }
 
-                        // Empty state
+                        
                         if (controller.filteredList.isEmpty) {
                           return Center(
                             child: Padding(
@@ -92,7 +92,7 @@ class MealsView extends GetView<MealsController> {
                           );
                         }
 
-                        // List Data
+                        
                         return ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -102,8 +102,8 @@ class MealsView extends GetView<MealsController> {
 
                             return InkWell(
                               onTap: () {
-                                // Arahkan ke detail page
-                                // Anda bisa mengirim argumen food di sini
+                                
+                                
                                 Get.toNamed('/detail-food', arguments: food);
                               },
                               child: Container(
@@ -117,12 +117,12 @@ class MealsView extends GetView<MealsController> {
                                   color: AppColors.mainWhite,
                                   borderRadius: BorderRadius.circular(8.r),
                                 ),
-                                // main row
+                                
                                 child: Row(
                                   mainAxisAlignment:
                                   MainAxisAlignment.spaceBetween,
                                   children: [
-                                    //     left row
+                                    
                                     Expanded(
                                       child: Row(
                                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -157,7 +157,7 @@ class MealsView extends GetView<MealsController> {
                                                     ),
                                                     SizedBox(width: 2.w,),
                                                     Text(
-                                                      food.calories, // Mengambil dari getter di model
+                                                      food.calories, 
                                                       style: AppTextStyles.bodySmall,
                                                     ),
                                                   ],
@@ -168,7 +168,7 @@ class MealsView extends GetView<MealsController> {
                                         ],
                                       ),
                                     ),
-                                    //   right column
+                                    
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [

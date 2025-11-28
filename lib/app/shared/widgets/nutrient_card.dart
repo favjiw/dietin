@@ -49,7 +49,7 @@ class NutrientCard extends StatelessWidget {
                 ),
               ),
             ),
-            // konten
+            
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(

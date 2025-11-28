@@ -16,17 +16,13 @@ class DetailFoodController extends GetxController {
   void _loadFoodDetail() async {
     isLoading.value = true;
 
-    // Cek apakah ada argumen yang dikirim dari halaman sebelumnya
     if (Get.arguments != null) {
-      // Jika argumen adalah FoodModel object (dari list yang sudah diload)
       if (Get.arguments is FoodModel) {
         food.value = Get.arguments as FoodModel;
         isLoading.value = false;
 
-        // Opsional: Tetap fetch ulang untuk memastikan data terbaru (misal stok/detail lain)
         _fetchFoodById(food.value!.id);
       }
-      // Jika argumen hanya ID (misal dari deep link atau notifikasi)
       else if (Get.arguments is int) {
         await _fetchFoodById(Get.arguments as int);
       }
@@ -44,7 +40,7 @@ class DetailFoodController extends GetxController {
       }
     } catch (e) {
       print("Error loading food detail: $e");
-      if (food.value == null) { // Hanya tampilkan error jika data belum ada sama sekali
+      if (food.value == null) { 
         Get.snackbar("Error", "Gagal memuat detail makanan");
       }
     } finally {

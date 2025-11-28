@@ -11,18 +11,16 @@ class HomeController extends GetxController {
   var user = Rxn<UserModel>();
   var errorMessage = ''.obs;
 
-  // Log Makanan (Sekarang akan berisi gabungan item)
   var breakfastLog = Rxn<FoodLogModel>();
   var lunchLog = Rxn<FoodLogModel>();
   var dinnerLog = Rxn<FoodLogModel>();
 
-  // Nutrisi Harian
   var totalCaloriesConsumed = 0.obs;
   var totalCarbsConsumed = 0.obs;
   var totalProteinConsumed = 0.obs;
   var totalFatConsumed = 0.obs;
 
-  // Target (Dummy)
+  
   final targetCalories = 2000;
   final targetCarbs = 300;
   final targetProtein = 100;
@@ -59,7 +57,6 @@ class HomeController extends GetxController {
       final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
       final logs = await FoodLogService.to.getFoodLogsByDate(today);
 
-      // Reset data
       breakfastLog.value = null;
       lunchLog.value = null;
       dinnerLog.value = null;
@@ -69,14 +66,12 @@ class HomeController extends GetxController {
       double calcProtein = 0;
       double calcFat = 0;
 
-      // Temporary lists untuk menampung item gabungan
       List<FoodLogItemModel> breakfastItems = [];
       List<FoodLogItemModel> lunchItems = [];
       List<FoodLogItemModel> dinnerItems = [];
 
       if (logs.isNotEmpty) {
         for (var log in logs) {
-          // Kumpulkan item ke list sementara berdasarkan mealType
           switch (log.mealType) {
             case 'Breakfast':
               breakfastItems.addAll(log.items);
@@ -89,7 +84,6 @@ class HomeController extends GetxController {
               break;
           }
 
-          // Hitung nutrisi (tetap sama logikanya)
           for (var item in log.items) {
             calcCalories += item.calories;
 
@@ -108,16 +102,13 @@ class HomeController extends GetxController {
         }
       }
 
-      // Buat FoodLogModel gabungan untuk ditampilkan di UI
-      // Kita pakai tanggal hari ini dan ID dummy karena ini adalah agregasi
       if (breakfastItems.isNotEmpty) {
         breakfastLog.value = FoodLogModel(
-          id: 0, // Dummy ID
+          id: 0, 
           date: today,
           mealType: 'Breakfast',
-          totalCalories: 0, // Tidak dipakai di UI (dihitung manual di view), atau bisa dihitung di sini
+          totalCalories: 0, 
           items: breakfastItems,
-          // userId: 0,
         );
       }
 
@@ -128,7 +119,6 @@ class HomeController extends GetxController {
           mealType: 'Lunch',
           totalCalories: 0,
           items: lunchItems,
-          // userId: 0,
         );
       }
 
@@ -139,11 +129,9 @@ class HomeController extends GetxController {
           mealType: 'Dinner',
           totalCalories: 0,
           items: dinnerItems,
-          // userId: 0,
         );
       }
 
-      // Update Observables Global
       totalCaloriesConsumed.value = calcCalories;
       totalCarbsConsumed.value = calcCarbs.round();
       totalProteinConsumed.value = calcProtein.round();

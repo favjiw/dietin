@@ -11,39 +11,28 @@ import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class CamController extends GetxController {
-  
   var isPhotoMode = true.obs;
-
-  
   var isLoading = false.obs;
-
-  
   var selectedMealType = 'Breakfast'.obs;
 
-  
   CameraController? cameraController;
   List<CameraDescription>? _cameras;
   var isCameraInitialized = false.obs;
 
-  
   late MobileScannerController scannerController;
 
   @override
   void onInit() {
     super.onInit();
-    
     scannerController = MobileScannerController(
       detectionSpeed: DetectionSpeed.noDuplicates,
       autoStart: false,
     );
-
-    
     _initializeCamera();
   }
 
   @override
   void onClose() {
-    
     _disposeCamera();
     scannerController.dispose();
     super.onClose();
@@ -69,7 +58,6 @@ class CamController extends GetxController {
     }
   }
 
-  
   Future<void> toggleMode() async {
     if (isPhotoMode.value) {
       
@@ -82,9 +70,7 @@ class CamController extends GetxController {
       } catch (e) {
         print("Error starting scanner: $e");
       }
-
     } else {
-      
       await scannerController.stop();
       isPhotoMode.value = true;
       await _initializeCamera();
@@ -162,14 +148,12 @@ class CamController extends GetxController {
       if (barcode.rawValue != null) {
         if (isLoading.value) return; 
 
-        
         scannerController.stop();
 
         try {
           isLoading.value = true;
           final upc = barcode.rawValue!;
 
-          
           final result = await FoodService.to.searchFoodByUpc(upc);
 
           isLoading.value = false;
@@ -186,8 +170,6 @@ class CamController extends GetxController {
             backgroundColor: Colors.red,
             colorText: Colors.white,
           );
-
-          
           await Future.delayed(const Duration(seconds: 2));
           if (!isPhotoMode.value) {
             scannerController.start();
@@ -201,7 +183,6 @@ class CamController extends GetxController {
 
   
   void _showScanResultSheet(Map<String, dynamic> data, {File? imageFile}) {
-    
     final hour = DateTime.now().hour;
     if (hour >= 11 && hour < 16) {
       selectedMealType.value = 'Lunch';
@@ -221,7 +202,6 @@ class CamController extends GetxController {
         ),
         child: Column(
           children: [
-            
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.h),
               child: Container(
@@ -234,14 +214,12 @@ class CamController extends GetxController {
               ),
             ),
 
-            
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    
                     Center(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(24.r),
@@ -274,15 +252,11 @@ class CamController extends GetxController {
                       ),
                     ),
                     SizedBox(height: 24.h),
-
-                    
                     Text(
                       data['name'] ?? 'Makanan Terdeteksi',
                       style: AppTextStyles.foodTitle,
                     ),
                     SizedBox(height: 12.h),
-
-                    
                     Wrap(
                       spacing: 8.w,
                       runSpacing: 8.h,
@@ -307,8 +281,6 @@ class CamController extends GetxController {
                       ],
                     ),
                     SizedBox(height: 24.h),
-
-                    
                     Text("Dimakan saat?", style: AppTextStyles.labelBold),
                     SizedBox(height: 8.h),
                     Container(
@@ -335,8 +307,6 @@ class CamController extends GetxController {
                       )),
                     ),
                     SizedBox(height: 24.h),
-
-                    
                     if (data['nutritionFacts'] != null && (data['nutritionFacts'] as List).isNotEmpty) ...[
                       Text('Informasi Nutrisi', style: AppTextStyles.foodLabel),
                       SizedBox(height: 12.h),
@@ -363,8 +333,6 @@ class CamController extends GetxController {
                       ),
                       SizedBox(height: 24.h),
                     ],
-
-                    
                     if (data['ingredients'] != null && (data['ingredients'] as List).isNotEmpty) ...[
                       Text('Bahan', style: AppTextStyles.foodLabel),
                       SizedBox(height: 12.h),
@@ -391,8 +359,6 @@ class CamController extends GetxController {
                       ),
                       SizedBox(height: 24.h),
                     ],
-
-                    
                     if (data['description'] != null) ...[
                       Text('Deskripsi', style: AppTextStyles.foodLabel),
                       SizedBox(height: 8.h),
@@ -402,22 +368,18 @@ class CamController extends GetxController {
                       ),
                       SizedBox(height: 24.h),
                     ],
-
-                    
                     SizedBox(height: 100.h),
                   ],
                 ),
               ),
             ),
-
-            
             Container(
               padding: EdgeInsets.all(24.w),
               decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, -5),
                     )
@@ -457,7 +419,6 @@ class CamController extends GetxController {
       
       isLoading.value = false;
 
-      
       if (!isPhotoMode.value) {
         scannerController.start();
       }
@@ -509,21 +470,16 @@ class CamController extends GetxController {
     try {
       await _disposeCamera();
       scannerController.stop();
-
       Get.back();
       isLoading.value = true;
-
       String mealType = selectedMealType.value;
-
       if (data.containsKey('upcCode')) {
         final logData = {
           'mealType': mealType,
           'date': DateTime.now().toIso8601String().split('T')[0],
           'servingsConsumed': 1
         };
-
         await FoodService.to.logFoodByUpc(data['upcCode'], logData);
-
       } else {
         final logData = {
           ...data,
@@ -534,9 +490,7 @@ class CamController extends GetxController {
 
         await FoodService.to.scanAndLogFood(logData);
       }
-
       isLoading.value = false;
-
       Get.snackbar(
         'Berhasil',
         'Makanan berhasil dicatat ke $mealType!',
@@ -544,7 +498,6 @@ class CamController extends GetxController {
         colorText: Colors.white,
       );
       Get.until((route) => route.settings.name == Routes.BOTNAVBAR);
-
     } catch (e) {
       isLoading.value = false;
       Get.snackbar('Gagal', 'Gagal menyimpan log: $e');
