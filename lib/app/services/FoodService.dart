@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert'; // Import ini penting untuk jsonDecode
+import 'dart:io';
 import 'package:dietin/app/data/FoodLogModel.dart';
 import 'package:dietin/app/data/FoodModel.dart';
 import 'package:dietin/app/network/endpoint.dart';
@@ -13,7 +15,7 @@ class FoodService extends GetConnect {
   void onInit() {
     // Ganti dengan URL backend Anda yang benar
     httpClient.baseUrl = 'https://selma-unrecorded-dearly.ngrok-free.dev';
-    httpClient.timeout = const Duration(seconds: 30);
+    httpClient.timeout = const Duration(seconds: 60);
 
     httpClient.addRequestModifier<dynamic>((request) {
       final token = _storage.read('accessToken');
@@ -90,6 +92,97 @@ class FoodService extends GetConnect {
     } catch (e) {
       print('[FoodService] Error getFoodLogsByDate: $e');
       return [];
+    }
+  }
+
+  // 1. POST /food/scan
+  Future<dynamic> scanFood(File imageFile) async {
+    try {
+      final form = FormData({
+        'image': MultipartFile(
+            imageFile,
+            filename: 'food_scan.jpg',
+            contentType: 'image/jpeg' // Explicit content type
+        ),
+      });
+
+      final response = await post(Endpoint.foodScan, form);
+
+      // --- PERBAIKAN START: Handle Parsing Response Body ---
+      var body = response.body;
+
+      // Jika body berupa String (raw JSON atau HTML error), coba decode manual
+      if (body is String) {
+        try {
+          // Cek apakah ini HTML error page
+          if (body.trim().toLowerCase().startsWith('<!doctype html') ||
+              body.trim().toLowerCase().startsWith('<html')) {
+            print("Server returned HTML Error: $body");
+            throw Exception("Server Error (HTML Response). Cek log server.");
+          }
+          body = jsonDecode(body);
+        } catch (e) {
+          print("Gagal decode JSON: $body");
+          // Jika gagal decode dan bukan error HTML yang sudah dilempar, biarkan body apa adanya
+        }
+      }
+
+      if (response.status.hasError) {
+        // Ambil pesan error dengan aman
+        String message = 'Gagal memindai makanan';
+        if (body is Map && body['message'] != null) {
+          message = body['message'];
+        } else if (body is String) {
+          // Jika body string murni (bukan json), gunakan sebagai pesan error jika pendek
+          if (body.length < 100) message = body;
+          else message = 'Server Error: ${response.statusText}';
+        }
+
+        throw Exception(message);
+      }
+
+      // Pastikan body adalah Map sebelum akses key
+      if (body is Map &&
+          body['response'] != null &&
+          body['response']['payload'] != null) {
+        return body['response']['payload'];
+      }
+
+      return null;
+      // --- PERBAIKAN END ---
+
+    } catch (e) {
+      print('[FoodService] Error scanFood: $e');
+      // Rethrow agar controller bisa menangkap dan menampilkan snackbar
+      rethrow;
+    }
+  }
+
+  // 2. POST /food/scan-and-log
+  // Mengirim data hasil scan untuk disimpan ke database
+  Future<bool> scanAndLogFood(Map<String, dynamic> foodData) async {
+    try {
+      // Kita kirim balik data yang didapat dari hasil scan
+      // Backend akan memprosesnya menjadi log makanan
+      final response = await post(Endpoint.foodScanLog, foodData);
+
+      if (response.status.hasError) {
+        // Handle parsing untuk error message juga
+        var body = response.body;
+        if (body is String) {
+          try { body = jsonDecode(body); } catch (_) {}
+        }
+
+        String msg = 'Gagal menyimpan makanan';
+        if (body is Map && body['message'] != null) msg = body['message'];
+
+        throw Exception(msg);
+      }
+
+      return true;
+    } catch (e) {
+      print('[FoodService] Error scanAndLogFood: $e');
+      rethrow;
     }
   }
 }
