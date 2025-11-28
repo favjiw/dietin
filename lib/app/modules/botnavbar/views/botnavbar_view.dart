@@ -1,11 +1,8 @@
-import 'package:dietin/app/modules/home/controllers/home_controller.dart';
 import 'package:dietin/app/modules/home/views/home_view.dart';
-import 'package:dietin/app/modules/meals/controllers/meals_controller.dart';
 import 'package:dietin/app/modules/meals/views/meals_view.dart';
-import 'package:dietin/app/modules/profile/controllers/profile_controller.dart';
 import 'package:dietin/app/modules/profile/views/profile_view.dart';
-import 'package:dietin/app/modules/statistics/controllers/statistics_controller.dart';
 import 'package:dietin/app/modules/statistics/views/statistics_view.dart';
+import 'package:dietin/app/routes/app_pages.dart'; // Pastikan import Routes
 import 'package:dietin/app/shared/constants/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,7 +23,7 @@ class BotnavbarView extends GetView<BotnavbarController> {
     final List<Widget> pages = const [
       HomeView(),
       MealsView(),
-      SizedBox(), // halaman tengah untuk scan, sementara kosong
+      SizedBox(), // Halaman dummy karena tombol tengah navigasi ke route lain
       StatisticsView(),
       ProfileView(),
     ];
@@ -104,7 +101,7 @@ class BotnavbarView extends GetView<BotnavbarController> {
                           ],
                         ),
                       ),
-                      SizedBox(width: 24.w, height: 24.h),
+                      SizedBox(width: 24.w, height: 24.h), // Space untuk tombol tengah
                       InkWell(
                         onTap: () {
                           controller.currentIndex.value = 3;
@@ -166,8 +163,11 @@ class BotnavbarView extends GetView<BotnavbarController> {
                     borderRadius: BorderRadius.circular(25.r),
                   ),
                   child: InkWell(
+                    // PERUBAHAN DI SINI:
+                    // Saat diklik, langsung navigasi ke Routes.CAM
+                    // Tidak mengubah currentIndex agar botnavbar tetap di tab sebelumnya
                     onTap: () {
-                      controller.currentIndex.value = 2;
+                      Get.toNamed(Routes.CAM);
                     },
                     child: Container(
                       width: 56.w,
