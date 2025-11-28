@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 class TokenModel {
   final String accessToken;
   final String refreshToken;

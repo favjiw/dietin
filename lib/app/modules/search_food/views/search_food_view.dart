@@ -21,9 +21,7 @@ class SearchFoodView extends GetView<SearchFoodController> {
       ),
     );
 
-    // Map MealType ke Bahasa Indonesia untuk judul
     String title = 'Tambah Makanan';
-    // Akses aman ke mealType, gunakan default jika belum diinisialisasi (walaupun onInit sudah handle)
     try {
       if (controller.mealType == 'Breakfast') title = 'Tambah Sarapan';
       if (controller.mealType == 'Lunch') title = 'Tambah Makan Siang';
@@ -52,7 +50,7 @@ class SearchFoodView extends GetView<SearchFoodController> {
             },
           ),
           actions: [
-            // Tombol Simpan di AppBar (Icon Ceklis)
+            
             Obx(() {
               if (controller.isSubmitting.value) {
                 return Padding(
@@ -65,8 +63,8 @@ class SearchFoodView extends GetView<SearchFoodController> {
                 );
               }
 
-              // Tampilkan ceklis hanya jika ada yang dipilih
-              // selectedCount adalah getter yang mengakses selectedItems, jadi reaktif di dalam Obx
+              
+              
               if (controller.selectedCount > 0) {
                 return IconButton(
                   onPressed: () => controller.submitLog(),
@@ -106,7 +104,7 @@ class SearchFoodView extends GetView<SearchFoodController> {
                 ),
               ),
 
-              // List Makanan (Expanded agar scrollable dan mengisi sisa ruang)
+              
               Expanded(
                 child: Obx(() {
                   if (controller.isLoading.value) {
@@ -132,7 +130,7 @@ class SearchFoodView extends GetView<SearchFoodController> {
                     itemBuilder: (context, index) {
                       final food = controller.filteredFoods[index];
 
-                      // BUNGKUS ITEM DENGAN OBX AGAR REAKTIF PER ITEM
+                      
                       return Obx(() {
                         final isChecked = controller.isSelected(food.id);
 
@@ -170,14 +168,14 @@ class SearchFoodView extends GetView<SearchFoodController> {
                                         text: TextSpan(
                                           children: [
                                             TextSpan(
-                                              // Updated: Menggunakan servingType jika tersedia, default 'Porsi'
+                                              
                                               text: '${food.servings ?? 1} ${food.servingType ?? 'Porsi'} ',
                                               style: AppTextStyles.bodyLight.copyWith(
                                                 color: AppColors.primary,
                                               ),
                                             ),
                                             TextSpan(
-                                              text: '${food.calories} kkal', // Asumsi helper calories ada di FoodModel
+                                              text: '${food.calories} kkal', 
                                               style: AppTextStyles.bodyLight,
                                             ),
                                           ],
@@ -187,7 +185,7 @@ class SearchFoodView extends GetView<SearchFoodController> {
                                   ),
                                 ),
                                 SizedBox(width: 12.w),
-                                // Checkbox Custom
+                                
                                 AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
                                   width: 24.w,
@@ -224,7 +222,7 @@ class SearchFoodView extends GetView<SearchFoodController> {
             ],
           ),
         ),
-        // Floating Action Button (Scan) tetap dipertahankan jika perlu
+        
         floatingActionButton: FloatingActionButton(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25.r),

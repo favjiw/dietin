@@ -5,33 +5,33 @@ import 'package:dietin/app/services/FoodLogService.dart';
 import 'package:dietin/app/services/UserService.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart'; // Import this
+import 'package:intl/date_symbol_data_local.dart'; 
 
 class StatisticsController extends GetxController {
   var isLoading = false.obs;
 
-  // --- State UI ---
-  final selectedTab = 0.obs; // 0: Hari, 1: Minggu, 2: Bulan
+  
+  final selectedTab = 0.obs; 
   final selectedNutrient = 'Kalori'.obs;
   final touchedIndex = (-1).obs;
   final selectedDayIndex = (-1).obs;
 
-  // Changed: Initialize with empty string to avoid LocaleDataException before init
+  
   final selectedMonth = ''.obs;
   final selectedYear = DateTime.now().year.toString().obs;
 
   final currentDateRangeIndex = 0.obs;
 
-  // --- Data Master ---
-  // Menyimpan semua log mentah dari API
+  
+  
   var allLogs = <FoodLogModel>[].obs;
 
-  // Data User untuk BMI
+  
   var user = Rxn<UserModel>();
   var bmiValue = 0.0.obs;
   var bmiStatus = ''.obs;
 
-  // --- Konstanta ---
+  
   final List<String> nutrients = ['Kalori', 'Protein', 'Karbohidrat', 'Lemak'];
   final List<String> months = [
     'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -47,13 +47,13 @@ class StatisticsController extends GetxController {
   }
 
   Future<void> _initializeController() async {
-    // Initialize locale data for Indonesian
+    
     await initializeDateFormatting('id_ID', null);
 
-    // Set selectedMonth after locale is initialized
+    
     selectedMonth.value = DateFormat('MMMM', 'id_ID').format(DateTime.now());
 
-    // Then load statistics
+    
     loadStatistics();
   }
 
@@ -72,7 +72,7 @@ class StatisticsController extends GetxController {
       final data = await UserServices.to.fetchUserProfile();
       final userModel = UserModel.fromJson(data);
       user.value = userModel;
-      // FIX: Explicitly convert int? to double?
+      
       _calculateBMI(userModel.height?.toDouble(), userModel.weight?.toDouble());
     } catch (e) {
       print('[Stats] Error fetching user: $e');
@@ -81,7 +81,7 @@ class StatisticsController extends GetxController {
 
   Future<void> fetchAllLogs() async {
     try {
-      // Ambil banyak data sekaligus untuk di-filter lokal
+      
       final logs = await FoodLogService.to.getAllFoodLogs(limit: 100);
       allLogs.assignAll(logs);
       print('[Stats] Loaded ${logs.length} logs');
@@ -103,23 +103,23 @@ class StatisticsController extends GetxController {
     }
   }
 
-  // ==========================================================================
-  // LOGIKA DATA CHART (GETTERS)
-  // ==========================================================================
+  
+  
+  
 
-  // ---------------- DAILY DATA (Pie Chart) ----------------
+  
   Map<String, Map<String, dynamic>> get nutritionData {
-    // Filter logs untuk HARI INI
+    
     final now = DateTime.now();
     final todayStr = DateFormat('yyyy-MM-dd').format(now);
 
     final todayLogs = allLogs.where((log) {
-      // Pastikan format tanggal backend sesuai (biasanya ISO8601)
-      // Kita ambil bagian yyyy-MM-dd nya saja
+      
+      
       return log.date.startsWith(todayStr);
     }).toList();
 
-    // Template struktur data
+    
     Map<String, Map<String, dynamic>> data = {
       'Kalori': {'total': 2000, 'consumed': 0, 'sections': []},
       'Protein': {'total': 150, 'consumed': 0, 'sections': []},
@@ -127,21 +127,21 @@ class StatisticsController extends GetxController {
       'Lemak': {'total': 70, 'consumed': 0, 'sections': []},
     };
 
-    // Helper untuk inisialisasi sections
+    
     List<Map<String, dynamic>> initSections() => [
       {'label': 'Sarapan', 'value': 0},
       {'label': 'Makan Siang', 'value': 0},
       {'label': 'Makan Malam', 'value': 0},
     ];
 
-    // Set initial sections
+    
     data.forEach((key, value) {
       value['sections'] = initSections();
     });
 
-    // Iterasi Log Hari Ini
+    
     for (var log in todayLogs) {
-      // Tentukan index section berdasarkan mealType
+      
       int sectionIndex = -1;
       if (log.mealType == 'Breakfast') sectionIndex = 0;
       else if (log.mealType == 'Lunch') sectionIndex = 1;
@@ -149,14 +149,14 @@ class StatisticsController extends GetxController {
 
       if (sectionIndex == -1) continue;
 
-      // Hitung nutrisi item di log ini
+      
       for (var item in log.items) {
-        int cal = item.calories; // Kalori sudah dihitung di model
+        int cal = item.calories; 
         double prot = _getNutrient(item, ['Protein']);
         double carb = _getNutrient(item, ['Karbohidrat', 'Carbs']);
         double fat = _getNutrient(item, ['Lemak', 'Fat']);
 
-        // Update Data Kalori
+        
         _updateDailyData(data['Kalori']!, sectionIndex, cal);
         _updateDailyData(data['Protein']!, sectionIndex, (prot * item.servings).round());
         _updateDailyData(data['Karbohidrat']!, sectionIndex, (carb * item.servings).round());
@@ -173,15 +173,15 @@ class StatisticsController extends GetxController {
     sections[sectionIndex]['value'] = (sections[sectionIndex]['value'] as int) + value;
   }
 
-  // ---------------- WEEKLY DATA (Bar Chart) ----------------
+  
   Map<String, Map<String, dynamic>> get weeklyNutritionData {
-    // Tentukan rentang minggu ini (Minggu s/d Sabtu)
+    
     final now = DateTime.now();
-    // cari hari Minggu terakhir (atau hari ini jika Minggu)
+    
     final startOfWeek = now.subtract(Duration(days: now.weekday % 7));
-    // final endOfWeek = startOfWeek.add(const Duration(days: 6));
+    
 
-    // Template Data
+    
     Map<String, Map<String, dynamic>> data = {
       'Kalori': {'total': 2000, 'days': []},
       'Protein': {'total': 150, 'days': []},
@@ -189,15 +189,15 @@ class StatisticsController extends GetxController {
       'Lemak': {'total': 70, 'days': []},
     };
 
-    // Generate struktur 7 hari
+    
     for (int i = 0; i < 7; i++) {
       final currentDayDate = startOfWeek.add(Duration(days: i));
       final dateStr = DateFormat('yyyy-MM-dd').format(currentDayDate);
 
-      // Filter log untuk tanggal ini
+      
       final dayLogs = allLogs.where((log) => log.date.startsWith(dateStr)).toList();
 
-      // Hitung total per nutrisi untuk hari ini
+      
       _calculateDayForWeekly(data['Kalori']!, 'Kalori', dayLogs, i);
       _calculateDayForWeekly(data['Protein']!, 'Protein', dayLogs, i);
       _calculateDayForWeekly(data['Karbohidrat']!, 'Karbohidrat', dayLogs, i);
@@ -233,7 +233,7 @@ class StatisticsController extends GetxController {
         if (nutrientName == 'Kalori') {
           val = item.calories.toDouble();
         } else {
-          // Mapping nama nutrisi
+          
           List<String> keys = [];
           if (nutrientName == 'Protein') keys = ['Protein'];
           if (nutrientName == 'Karbohidrat') keys = ['Karbohidrat', 'Carbs'];
@@ -247,7 +247,7 @@ class StatisticsController extends GetxController {
       }
     }
 
-    // Hitung persentase terhadap target (Max bar height)
+    
     int target = nutrientData['total'];
     double percentage = (totalValue / target).clamp(0.0, 1.0);
 
@@ -259,11 +259,11 @@ class StatisticsController extends GetxController {
     });
   }
 
-  // ---------------- MONTHLY DATA (Line Chart) ----------------
+  
   Map<String, Map<String, dynamic>> get monthlyNutritionData {
     int year = int.tryParse(selectedYear.value) ?? DateTime.now().year;
     int monthIndex = months.indexOf(selectedMonth.value) + 1;
-    // Fix: if selectedMonth is empty (before init), use current month
+    
     if (monthIndex == 0) monthIndex = DateTime.now().month;
 
     int daysInMonth = DateTime(year, monthIndex + 1, 0).day;
@@ -275,7 +275,7 @@ class StatisticsController extends GetxController {
       'Lemak': {'total': 70, 'days': []},
     };
 
-    // Generate data 1 sampai tgl terakhir
+    
     for (int d = 1; d <= daysInMonth; d++) {
       String dateStr = '$year-${monthIndex.toString().padLeft(2, '0')}-${d.toString().padLeft(2, '0')}';
 
@@ -324,9 +324,9 @@ class StatisticsController extends GetxController {
     });
   }
 
-  // --- Helpers ---
+  
 
-  // Filtered data untuk paginasi chart bulanan (5 hari per page)
+  
   Map<String, dynamic> get filteredMonthlyData {
     final fullData = monthlyNutritionData[selectedNutrient.value]!;
     final allDays = fullData['days'] as List;
@@ -334,7 +334,7 @@ class StatisticsController extends GetxController {
     final startIndex = currentDateRangeIndex.value * 5;
     final endIndex = (startIndex + 5).clamp(0, allDays.length);
 
-    // Handle case jika range index melebihi data (misal ganti bulan yg harinya lebih sedikit)
+    
     if (startIndex >= allDays.length) {
       return {
         'total': fullData['total'],
@@ -375,7 +375,7 @@ class StatisticsController extends GetxController {
     }
   }
 
-  // UI Actions
+  
   void changeTab(int index) {
     selectedTab.value = index;
     selectedDayIndex.value = -1;

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:dietin/app/shared/constants/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +16,7 @@ class DetailFoodView extends GetView<DetailFoodController> {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light, // Icon status bar putih karena background gambar
+        statusBarIconBrightness: Brightness.light, 
       ),
     );
 
@@ -37,7 +35,7 @@ class DetailFoodView extends GetView<DetailFoodController> {
         return SingleChildScrollView(
           child: Stack(
             children: [
-              // Gambar Header
+              
               Container(
                 height: 400.h,
                 width: double.infinity,
@@ -50,7 +48,7 @@ class DetailFoodView extends GetView<DetailFoodController> {
                   ),
                 ),
               ),
-              // Gradient Overlay agar teks/icon diatas gambar lebih terbaca
+              
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
@@ -58,7 +56,7 @@ class DetailFoodView extends GetView<DetailFoodController> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withOpacity(0.4),
+                        Colors.black.withValues(alpha: 0.4),
                         Colors.transparent,
                         Colors.transparent,
                       ],
@@ -70,7 +68,7 @@ class DetailFoodView extends GetView<DetailFoodController> {
               Column(
                 children: [
                   SizedBox(height: 56.h),
-                  // App Bar Custom
+                  
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: Row(
@@ -109,14 +107,14 @@ class DetailFoodView extends GetView<DetailFoodController> {
                     ),
                   ),
 
-                  // Spacer agar konten mulai dari bawah gambar
-                  SizedBox(height: 220.h), // Sesuaikan tinggi agar overlap pas
+                  
+                  SizedBox(height: 220.h), 
 
-                  // Konten Utama (Sheet Putih)
+                  
                   Container(
                     width: double.infinity,
                     constraints: BoxConstraints(
-                      minHeight: 500.h, // Agar sheet mengisi setidaknya sisa layar
+                      minHeight: 500.h, 
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.secondaryWhite,
@@ -130,7 +128,7 @@ class DetailFoodView extends GetView<DetailFoodController> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Header Makanan (Nama & Kategori)
+                          
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,7 +155,7 @@ class DetailFoodView extends GetView<DetailFoodController> {
                                           Padding(
                                             padding: EdgeInsets.only(left: 6.w),
                                             child: _buildTag(
-                                              // Updated: Menggunakan servingType
+                                              
                                                 '${food.servings} ${food.servingType ?? 'porsi'}',
                                                 AppColors.yellow,
                                                 Icons.restaurant_menu
@@ -173,7 +171,7 @@ class DetailFoodView extends GetView<DetailFoodController> {
                                 backgroundColor: AppColors.mainWhite,
                                 child: IconButton(
                                   onPressed: () {
-                                    // TODO: Implement share
+                                    
                                   },
                                   icon: SvgPicture.asset(
                                     'assets/images/share_ic.svg',
@@ -186,7 +184,7 @@ class DetailFoodView extends GetView<DetailFoodController> {
                           ),
                           SizedBox(height: 24.h),
 
-                          // Informasi Nutrisi
+                          
                           if (food.nutritionFacts.isNotEmpty) ...[
                             Text('Informasi Nutrisi', style: AppTextStyles.foodLabel),
                             SizedBox(height: 12.h),
@@ -214,7 +212,7 @@ class DetailFoodView extends GetView<DetailFoodController> {
                             SizedBox(height: 24.h),
                           ],
 
-                          // Bahan-bahan
+                          
                           if (food.ingredients.isNotEmpty) ...[
                             Text('Bahan', style: AppTextStyles.foodLabel),
                             SizedBox(height: 12.h),
@@ -242,7 +240,7 @@ class DetailFoodView extends GetView<DetailFoodController> {
                             SizedBox(height: 24.h),
                           ],
 
-                          // Cara Membuat
+                          
                           if (food.steps.isNotEmpty) ...[
                             Text('Cara Membuat', style: AppTextStyles.foodLabel),
                             SizedBox(height: 12.h),
