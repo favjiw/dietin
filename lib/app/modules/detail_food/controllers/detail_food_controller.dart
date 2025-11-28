@@ -1,6 +1,5 @@
 import 'package:dietin/app/data/FoodModel.dart';
 import 'package:dietin/app/services/FoodService.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class DetailFoodController extends GetxController {

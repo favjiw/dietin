@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 
 import '../modules/botnavbar/bindings/botnavbar_binding.dart';
 import '../modules/botnavbar/views/botnavbar_view.dart';
+import '../modules/cam/bindings/cam_binding.dart';
+import '../modules/cam/views/cam_view.dart';
 import '../modules/detail_food/bindings/detail_food_binding.dart';
 import '../modules/detail_food/views/detail_food_view.dart';
 import '../modules/forgot_password/bindings/forgot_password_binding.dart';
@@ -123,6 +125,11 @@ class AppPages {
       name: _Paths.STATISTICS,
       page: () => const StatisticsView(),
       binding: StatisticsBinding(),
+    ),
+    GetPage(
+      name: _Paths.CAM,
+      page: () => const CamView(),
+      binding: CamBinding(),
     ),
   ];
 }

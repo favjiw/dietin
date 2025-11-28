@@ -1,3 +1,4 @@
+import 'package:dietin/app/modules/cam/controllers/cam_controller.dart';
 import 'package:dietin/app/modules/home/controllers/home_controller.dart';
 import 'package:dietin/app/modules/meals/controllers/meals_controller.dart';
 import 'package:dietin/app/modules/profile/controllers/profile_controller.dart';
@@ -19,6 +20,7 @@ class BotnavbarBinding extends Bindings {
 
     Get.lazyPut<BotnavbarController>(() => BotnavbarController(), fenix: true);
     Get.lazyPut<HomeController>(() => HomeController(), fenix: true);
+    Get.lazyPut<CamController>(() => CamController(), fenix: true);
     Get.lazyPut<MealsController>(() => MealsController(), fenix: true);
     Get.lazyPut<StatisticsController>(
       () => StatisticsController(),
